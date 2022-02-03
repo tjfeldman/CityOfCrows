@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Actions;
 
 public class UnitController : MonoBehaviour
 {
@@ -24,10 +25,15 @@ public class UnitController : MonoBehaviour
         posY = y;
     }
 
+    public Vector2Int GetPosition()
+    {
+        return new Vector2Int(posX, posY);
+    }
+
     private UnitDisplayHandler displayHandler;
     public void SetDisplayHandler(UnitDisplayHandler displayHandler) { this.displayHandler = displayHandler; }
     
-    void OnMouseDown() 
+    private void OnMouseDown() 
     {
         Debug.Log("You have clicked on Unit: " + unit.Name);
         //Display Stats in Corner
@@ -36,10 +42,14 @@ public class UnitController : MonoBehaviour
         if (typeof(PlayerUnit).IsInstanceOfType(unit))
         {
             Debug.Log("Player Unit clicked, spawning buttons");
+            //create buttons
             GameObject movePrefab = Resources.Load("Buttons/MoveButton") as GameObject;
             GameObject waitPrefab = Resources.Load("Buttons/WaitButton") as GameObject;
             GameObject moveButton = Instantiate(movePrefab, new Vector3(posX + 1.5f, posY + 1.25f,-1), Quaternion.identity);
             GameObject waitButton = Instantiate(waitPrefab, new Vector3(posX + 1.5f, posY,-1), Quaternion.identity);
+
+            //add unit controller to button action
+            moveButton.GetComponentInChildren<Action>().Unit = this;
 
             //add button to display handler
             displayHandler.AddButtonToDisplay(moveButton);
@@ -47,6 +57,11 @@ public class UnitController : MonoBehaviour
 
             //Set Buttons this Unit for commands
         }
+    }
+
+    public override string ToString() 
+    {
+        return unit.Name + "(" + unit.GetType()  + ")";
     }
 
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using Tiles;
 
 public class GridManager : MonoBehaviour
 {
@@ -29,16 +30,17 @@ public class GridManager : MonoBehaviour
     {
         gameGrid = new GameObject[width, height];
         Debug.Log("Creating Grid of Size: " + width + " x " + height);
-        GameObject tilePrefab = Resources.Load("GrassTile") as GameObject;
 
         for (int y = 0; y < height; y++) 
         {
             for (int x = 0; x < width; x++) 
             {
                 //create tile at cell
-                gameGrid[x, y] = Instantiate(tilePrefab, new Vector3(x * tileSize, y * tileSize, tileZ), Quaternion.identity);
-                gameGrid[x, y].GetComponent<Tile>().SetPosition(x, y);
-                gameGrid[x, y].GetComponent<Tile>().setDisplayHandler(displayHandler);
+                GrassTile tile = new GrassTile();
+                gameGrid[x, y] = Instantiate(tile.Prefab, new Vector3(x * tileSize, y * tileSize, tileZ), Quaternion.identity);
+                gameGrid[x, y].GetComponent<TileController>().SetTileType(tile);
+                gameGrid[x, y].GetComponent<TileController>().SetPosition(x, y);
+                gameGrid[x, y].GetComponent<TileController>().setDisplayHandler(displayHandler);
                 gameGrid[x, y].transform.parent = transform;
                 gameGrid[x, y].gameObject.name = "Grass Tile (X: " + x.ToString() + ", Y: " + y.ToString() + ")";
             }
@@ -52,23 +54,25 @@ public class GridManager : MonoBehaviour
 
     private void SpawnPlayerArmy() 
     {
+        //TODO: Temp For Spawning Unit, but control of player army and spawning should be controlled elsewhere
+        int x = (int)Math.Round(width/2f, 4);
+        int y = (int)Math.Round(height/2f, 4);
         playerArmyHandler = new PlayerArmyHandler();
-        for (int i = 0; i < playerArmyHandler.PlayerArmy.Count; i++) 
-        {
-            Tuple<string, PlayerUnit> playerInfo = playerArmyHandler.PlayerArmy[i];
-            GameObject prefab = Resources.Load(playerInfo.Item1) as GameObject;
-            GameObject unit = Instantiate(prefab, new Vector3(6,1), Quaternion.identity); //set Z to 1 so it shows over tile
-            PlayerUnit pc = playerInfo.Item2;
-            unit.GetComponent<UnitController>().SetPosition(6,1);
-            unit.GetComponent<UnitController>().SetUnit(pc);
-            unit.GetComponent<UnitController>().SetDisplayHandler(displayHandler);
+        Tuple<string, PlayerUnit> playerInfo = playerArmyHandler.PlayerArmy[0]; 
+        GameObject prefab = Resources.Load(playerInfo.Item1) as GameObject;
+        GameObject unit = Instantiate(prefab, new Vector3(x,y), Quaternion.identity); //set Z to 1 so it shows over tile
+        PlayerUnit pc = playerInfo.Item2;
+        unit.GetComponent<UnitController>().SetPosition(x,y);
+        unit.GetComponent<UnitController>().SetUnit(pc);
+        unit.GetComponent<UnitController>().SetDisplayHandler(displayHandler);
+        gameGrid[x,y].GetComponent<TileController>().Unit = pc;
             
-            //Json Utility Test
-            // string json = JsonUtility.ToJson(pc);
-            // Debug.Log(json);
-        }
+        //Json Utility Test
+        // string json = JsonUtility.ToJson(pc);
+        // Debug.Log(json);
     }
 
+    //TODO: Control of Display should be moved elsewhere
     private void setUpDisplayHandler()
     {
         displayHandler = GameObject.Find("UnitDisplay").GetComponent<UnitDisplayHandler>();
