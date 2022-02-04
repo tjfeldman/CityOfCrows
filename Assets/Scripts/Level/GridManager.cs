@@ -46,13 +46,22 @@ public class GridManager : MonoBehaviour
             for (int x = 0; x < width; x++) 
             {
                 //create tile at cell
-                GrassTile tile = new GrassTile();
+                Tile tile = new GrassTile();
+                if (x % 2 == 0 || y % 2 == 0) {
+                    tile = new ForestTile();
+                }
+                if (y == 0 || y == 5) {
+                    tile = new MountainTile();
+                }
+                if (x > 3 && x < 6 && y < 3) {
+                    tile = new DesertTile();
+                }
                 gameGrid[x, y] = Instantiate(tile.Prefab, new Vector3(x * tileSize, y * tileSize, tileZ), Quaternion.identity);
                 gameGrid[x, y].GetComponentInChildren<TileController>().SetTileType(tile);
                 gameGrid[x, y].GetComponentInChildren<TileController>().SetPosition(x, y);
                 gameGrid[x, y].GetComponentInChildren<TileController>().setDisplayHandler(displayHandler);
                 gameGrid[x, y].transform.parent = transform;
-                gameGrid[x, y].gameObject.name = "Grass Tile (X: " + x.ToString() + ", Y: " + y.ToString() + ")";
+                gameGrid[x, y].gameObject.name = tile + " (X: " + x.ToString() + ", Y: " + y.ToString() + ")";
             }
         }
 
@@ -124,20 +133,17 @@ public class GridManager : MonoBehaviour
             if (isValidTile(x, y)) {
                 GameObject tile = gameGrid[x, y];
                 int movementCost = tile.GetComponentInChildren<TileController>().Tile.MovementCost;
-                //make sure tile is not already in valid movement options
-                
-                    //if unit has the movement to move on to the tile, add it to valid movement options and subtract movement cost from movement left
-                    if (movementLeft >= movementCost) {
-                        movementLeft -= movementCost;
-                        if (!validMovementOptions.Contains(tile)) 
-                        {
-                            validMovementOptions.Add(tile);
-                            //now continue to check the next tiles in the current direction
-                            checkValidMovementInDirection(validMovementOptions, startingDirection, new Vector2Int(x,y), currentDirection, movementLeft);
-                        }
-                }
+                movementLeft -= movementCost;
+                //if unit has the movement to move on to the tile, then we can continue
+                if (movementLeft >= 0) {
+                    //add tile to valid movement options if tile is not already in valid movement options
+                    if (!validMovementOptions.Contains(tile)) 
+                    {
+                        validMovementOptions.Add(tile);
+                    }
+                    //now continue to check the next tiles in the current direction
+                    checkValidMovementInDirection(validMovementOptions, startingDirection, new Vector2Int(x,y), currentDirection, movementLeft);
 
-                if (movementLeft > 0) {
                     //now check the directions to the side of the tile based on current direction as long as you don't go in the opposite direction
                     //adjacent directions are +1 and +3 from current direction
                     Direction adjacentDirection = currentDirection + 1;

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Tiles {
 
-    public class GrassTile : Tile
+    public class DesertTile : Tile
     {
-        public GrassTile() : base(1, "GrassTile") { }
+        public DesertTile() : base(3, "DesertTile") { }
     }
 
 }
