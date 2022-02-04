@@ -8,6 +8,7 @@ namespace Actions {
         protected override void OnMouseDown()
         {
             Debug.Log("Move Action for " + Unit.ToString() + " pressed");
+            Unit.DisplayMovementOptions();
         }
     }
 }

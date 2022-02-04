@@ -6,12 +6,22 @@ using Tiles;
 
 public class GridManager : MonoBehaviour
 {
+    private enum Direction
+    {
+        UP=1,
+        LEFT=2,
+        DOWN=3,
+        RIGHT=4,
+    }
+
     private int width = 12;
     private int height = 6;
     private int tileZ = 1; //set to 1 so every character is shown over it.
     private float tileSize = 1f;
 
     private GameObject[,] gameGrid;
+    private List<GameObject> validMovementOptions;
+    private List<GameObject> movementTiles;
     private PlayerArmyHandler playerArmyHandler;
     private UnitDisplayHandler displayHandler;
 
@@ -38,9 +48,9 @@ public class GridManager : MonoBehaviour
                 //create tile at cell
                 GrassTile tile = new GrassTile();
                 gameGrid[x, y] = Instantiate(tile.Prefab, new Vector3(x * tileSize, y * tileSize, tileZ), Quaternion.identity);
-                gameGrid[x, y].GetComponent<TileController>().SetTileType(tile);
-                gameGrid[x, y].GetComponent<TileController>().SetPosition(x, y);
-                gameGrid[x, y].GetComponent<TileController>().setDisplayHandler(displayHandler);
+                gameGrid[x, y].GetComponentInChildren<TileController>().SetTileType(tile);
+                gameGrid[x, y].GetComponentInChildren<TileController>().SetPosition(x, y);
+                gameGrid[x, y].GetComponentInChildren<TileController>().setDisplayHandler(displayHandler);
                 gameGrid[x, y].transform.parent = transform;
                 gameGrid[x, y].gameObject.name = "Grass Tile (X: " + x.ToString() + ", Y: " + y.ToString() + ")";
             }
@@ -50,6 +60,123 @@ public class GridManager : MonoBehaviour
         // float gridW = (width * tileSize) / -2f;
         // float girdH = (height * tileSize) / -2f;
         // transform.position = new Vector2(gridW, girdH);
+    }
+
+    public void ShowMovementOptionsForUnit(UnitController unit)
+    {
+        int movement = (int)unit.Unit.Movement;
+        Vector2Int position = unit.GetPosition();
+
+        validMovementOptions = new List<GameObject>();
+        for (int i = (int)Direction.UP; i <= (int)Direction.RIGHT; i++)
+        {
+            checkValidMovementInDirection(validMovementOptions, (Direction)i, position, (Direction)i, movement);
+        }
+
+        //draw valid movement options
+        GameObject prefab = Resources.Load("ValidMovementTile") as GameObject;
+        movementTiles = new List<GameObject>();
+        foreach (GameObject tile in validMovementOptions) 
+        {
+            Vector2Int tilePos = tile.GetComponentInChildren<TileController>().GetPosition();
+            GameObject movementTile = Instantiate(prefab, new Vector3(tilePos.x * tileSize, tilePos.y * tileSize, tileZ-1), Quaternion.identity);
+            movementTile.GetComponentInChildren<MoveTileController>().Unit = unit;
+            movementTile.GetComponentInChildren<MoveTileController>().SetPosition(tilePos.x, tilePos.y);
+            movementTile.transform.parent = transform;
+            movementTile.gameObject.name = "Movement Tile (X: " + tilePos.x.ToString() + ", Y: " + tilePos.y.ToString() + ")";
+            movementTiles.Add(movementTile);
+        }
+
+        validMovementOptions.Clear();//empty data so it's not being stored for no reason
+    }
+
+    public void MoveUnitToTile(UnitController unit, AbstractTileController tile)
+    {
+        Vector2Int tilePos = tile.GetPosition();
+        unit.gameObject.transform.position = new Vector3(tilePos.x * tileSize, tilePos.y * tileSize);
+        unit.SetPosition(tilePos.x, tilePos.y);
+        CloseMovementOptionsForUnit(unit);
+    }
+
+    private void checkValidMovementInDirection(List<GameObject> validMovementOptions, Direction startingDirection, Vector2Int position, Direction currentDirection, int movementLeft)
+    {
+        int x = position.x;
+        int y = position.y;
+
+        if (movementLeft > 0) {
+            if (currentDirection == Direction.UP)
+            {
+                y++;
+            }
+            else if (currentDirection == Direction.LEFT)
+            {
+                x++;
+            }
+            else if (currentDirection == Direction.DOWN)
+            {
+                y--;
+            }
+            else if (currentDirection == Direction.RIGHT)
+            {
+                x--;
+            }
+
+            if (isValidTile(x, y)) {
+                GameObject tile = gameGrid[x, y];
+                int movementCost = tile.GetComponentInChildren<TileController>().Tile.MovementCost;
+                //make sure tile is not already in valid movement options
+                
+                    //if unit has the movement to move on to the tile, add it to valid movement options and subtract movement cost from movement left
+                    if (movementLeft >= movementCost) {
+                        movementLeft -= movementCost;
+                        if (!validMovementOptions.Contains(tile)) 
+                        {
+                            validMovementOptions.Add(tile);
+                            //now continue to check the next tiles in the current direction
+                            checkValidMovementInDirection(validMovementOptions, startingDirection, new Vector2Int(x,y), currentDirection, movementLeft);
+                        }
+                }
+
+                if (movementLeft > 0) {
+                    //now check the directions to the side of the tile based on current direction as long as you don't go in the opposite direction
+                    //adjacent directions are +1 and +3 from current direction
+                    Direction adjacentDirection = currentDirection + 1;
+                    if (adjacentDirection > Direction.RIGHT) { adjacentDirection -= Direction.RIGHT; }
+                    if (isNotOppositeDirectionFromStarting(adjacentDirection, startingDirection)) {
+                        checkValidMovementInDirection(validMovementOptions, startingDirection, new Vector2Int(x,y), adjacentDirection, movementLeft);
+                    }
+
+                    adjacentDirection = currentDirection + 3;
+                    if (adjacentDirection > Direction.RIGHT) { adjacentDirection -= Direction.RIGHT; }
+                    if (isNotOppositeDirectionFromStarting(adjacentDirection, startingDirection)) {
+                        checkValidMovementInDirection(validMovementOptions, startingDirection, new Vector2Int(x,y), adjacentDirection, movementLeft);
+                    }
+                }
+
+            }
+        }
+    }
+
+    private bool isValidTile(int x, int y)
+    {
+        return (x >= 0 && x < width) && (y >= 0 && y < height);
+    }
+
+    //return true if the direction is the opposite direction from starting direction
+    private bool isNotOppositeDirectionFromStarting(Direction direction, Direction startingDirection)
+    {
+        Direction oppositeDirection = direction + 2; //opposite direction is +2 from direction
+        if (oppositeDirection > Direction.RIGHT) { oppositeDirection -= Direction.RIGHT; }
+        return startingDirection != oppositeDirection;
+    }
+
+    private void CloseMovementOptionsForUnit(UnitController unit) 
+    {
+        foreach (GameObject movementTile in movementTiles) 
+        {
+            Destroy(movementTile);
+        }
+        movementTiles.Clear();
     }
 
     private void SpawnPlayerArmy() 
@@ -65,7 +192,7 @@ public class GridManager : MonoBehaviour
         unit.GetComponent<UnitController>().SetPosition(x,y);
         unit.GetComponent<UnitController>().SetUnit(pc);
         unit.GetComponent<UnitController>().SetDisplayHandler(displayHandler);
-        gameGrid[x,y].GetComponent<TileController>().Unit = pc;
+        // gameGrid[x,y].GetComponentInChildren<TileController>().Unit = pc;
             
         //Json Utility Test
         // string json = JsonUtility.ToJson(pc);

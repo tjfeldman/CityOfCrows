@@ -41,10 +41,15 @@ public class UnitDisplayHandler : MonoBehaviour
     public void CloseAllDisplays() 
     {
         CloseButtonDisplays();
+        CloseStatDisplay();
+    }
+
+    public void CloseStatDisplay()
+    {
         gameObject.SetActive(false);
     }
 
-    private void CloseButtonDisplays() 
+    public void CloseButtonDisplays() 
     {
         foreach (GameObject button in buttons) {
             Destroy(button);

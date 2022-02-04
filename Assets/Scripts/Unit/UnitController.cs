@@ -59,6 +59,15 @@ public class UnitController : MonoBehaviour
         }
     }
 
+    public void DisplayMovementOptions() 
+    {
+        Debug.Log("Displaying Movement Options");
+        // displayHandler.CloseButtonDisplays();
+        displayHandler.CloseAllDisplays();
+        GameObject.Find("GridHandler").GetComponent<GridManager>().ShowMovementOptionsForUnit(this);
+        
+    }
+
     public override string ToString() 
     {
         return unit.Name + "(" + unit.GetType()  + ")";
