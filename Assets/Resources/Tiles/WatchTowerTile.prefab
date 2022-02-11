@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 4953638145151212121}
   - component: {fileID: 6650491948139046223}
   - component: {fileID: 5877196355294520168}
-  - component: {fileID: 1711844762230232818}
+  - component: {fileID: 4690295356075368059}
   m_Layer: 0
-  m_Name: ForestSprite
+  m_Name: Spirte
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6784740556927654110}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0.5, z: 0}
+  m_LocalPosition: {x: 1.5, y: 1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 41669544240560139}
@@ -73,7 +73,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: acfaf02dd1f767f4e98e34a7f9e4bd85, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8b53a1a3255cb0b40a89422effab03ac, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -101,16 +101,16 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 3, y: 3}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 3, y: 3}
   m_EdgeRadius: 0
---- !u!114 &1711844762230232818
+--- !u!114 &4690295356075368059
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -119,9 +119,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 6784740556927654110}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4de9ff6a7ec268c49be91750ac6ace59, type: 3}
+  m_Script: {fileID: 11500000, guid: cd70fb691d9919a4c93b08871fd7b6f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TileName: Watch Tower
+  MovementCost: -1
+  DetectionPenalty: -1
+  SpriteName: 
+  Size: 3
+  AutoSize: 0
 --- !u!1 &8790223404976371498
 GameObject:
   m_ObjectHideFlags: 0
@@ -132,7 +138,7 @@ GameObject:
   m_Component:
   - component: {fileID: 41669544240560139}
   m_Layer: 0
-  m_Name: ForestTile
+  m_Name: WatchTowerTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

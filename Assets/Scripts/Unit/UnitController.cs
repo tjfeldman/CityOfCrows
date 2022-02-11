@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Actions;
+using Manager;
 
 public class UnitController : MonoBehaviour
 {
@@ -30,14 +31,17 @@ public class UnitController : MonoBehaviour
         return new Vector2Int(posX, posY);
     }
 
-    private UnitDisplayHandler displayHandler;
-    public void SetDisplayHandler(UnitDisplayHandler displayHandler) { this.displayHandler = displayHandler; }
+    private GridManager gridManager;
+    public void SetGridManager(GridManager gridManager) { this.gridManager = gridManager; }
+
+    private DisplayManager displayManager;
+    public void setDisplayManager(DisplayManager displayManager) { this.displayManager = displayManager; }
     
     private void OnMouseDown() 
     {
         Debug.Log("You have clicked on Unit: " + unit.Name);
         //Display Stats in Corner
-        displayHandler.DisplayStatForUnit(unit);
+        displayManager.DisplayStatForUnit(unit);
 
         if (typeof(PlayerUnit).IsInstanceOfType(unit))
         {
@@ -52,8 +56,8 @@ public class UnitController : MonoBehaviour
             moveButton.GetComponentInChildren<Action>().Unit = this;
 
             //add button to display handler
-            displayHandler.AddButtonToDisplay(moveButton);
-            displayHandler.AddButtonToDisplay(waitButton);
+            displayManager.AddButtonToDisplay(moveButton);
+            displayManager.AddButtonToDisplay(waitButton);
 
             //Set Buttons this Unit for commands
         }
@@ -63,8 +67,8 @@ public class UnitController : MonoBehaviour
     {
         Debug.Log("Displaying Movement Options");
         // displayHandler.CloseButtonDisplays();
-        displayHandler.CloseAllDisplays();
-        GameObject.Find("GridHandler").GetComponent<GridManager>().ShowMovementOptionsForUnit(this);
+        displayManager.CloseAllDisplays();
+        gridManager.ShowMovementOptionsForUnit(this);
         
     }
 

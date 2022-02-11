@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Manager;
 
 public abstract class AbstractTileController : MonoBehaviour
 {
-
     //Position variables
     private int posX;
     private int posY;
@@ -19,4 +19,7 @@ public abstract class AbstractTileController : MonoBehaviour
     {
         return new Vector2Int(posX, posY);
     }
+
+    protected GridManager gridManager;
+    public void SetGridManager(GridManager gridManager) { this.gridManager = gridManager; }
 }

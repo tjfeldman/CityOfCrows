@@ -15,7 +15,7 @@ public class PlayerArmyHandler
 
         //load default army
         string prefab = "MainCharacter";
-        PlayerUnit mc = new PlayerUnit("MC", 15, 6, 6, 6, 0, 4, 4);
+        PlayerUnit mc = new PlayerUnit("MC", 15, 6, 6, 6, 0, 5, 5);
         playerArmy.Add(new Tuple<string, PlayerUnit>(prefab, mc));
     }
     

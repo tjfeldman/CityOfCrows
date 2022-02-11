@@ -43,3 +43,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edc02156a21253e4281bd0494a62cdff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Tile: {fileID: 8790223404976371498, guid: 9b7ce764ce2203740a511dbacb546722, type: 3}
+  MoveTile: {fileID: 3819817804794436225, guid: e9e22bfbc348e124eab50853c509621c, type: 3}

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Manager;
 
 public class MoveTileController : AbstractTileController
 {
@@ -8,6 +9,6 @@ public class MoveTileController : AbstractTileController
 
     void OnMouseDown() 
     {
-        GameObject.Find("GridHandler").GetComponent<GridManager>().MoveUnitToTile(Unit, this);
+        gridManager.MoveUnitToTile(Unit, this);
     }
 }
