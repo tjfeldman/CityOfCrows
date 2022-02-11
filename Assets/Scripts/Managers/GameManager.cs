@@ -95,12 +95,12 @@ namespace Manager
 
 
         //Event Handling
-        private void OnUnitClicked(UnitController unit)
+        private void OnUnitClicked(AbstractUnitController unit)
         {
-            Debug.Log("You have clicked on Unit: " + unit.Unit.Name);
-            displayManager.DisplayStatForUnit(unit.Unit);
+            Debug.Log("You have clicked on Unit: " + unit.UnitName);
+            displayManager.DisplayStatForUnit(unit);
 
-            if (typeof(PlayerUnit).IsInstanceOfType(unit.Unit))
+            if (typeof(PlayerUnitController).IsInstanceOfType(unit))
             {
                 Vector2Int position = unit.GetPosition();
                 //create buttons
@@ -110,7 +110,7 @@ namespace Manager
                 GameObject waitButton = Instantiate(waitPrefab, new Vector3(position.x + 1.5f, position.y,-1), Quaternion.identity);
 
                 //add unit controller to button action
-                moveButton.GetComponentInChildren<Action>().Unit = unit;
+                moveButton.GetComponentInChildren<Action>().Unit = (PlayerUnitController) unit;
 
                 //add button to display handler
                 displayManager.AddButtonToDisplay(moveButton);
@@ -124,7 +124,7 @@ namespace Manager
             displayManager.CloseAllDisplays();
         }
 
-        private void ShowMovementOptionsForUnit(UnitController unit)
+        private void ShowMovementOptionsForUnit(AbstractUnitController unit)
         {
             Debug.Log("Displaying Movement Options for " + unit);
             displayManager.CloseButtonDisplays();
@@ -132,7 +132,7 @@ namespace Manager
             gridManager.ShowMovementOptionsForUnit(unit);
         }
 
-        private void MoveUnitToTile(UnitController unit, MoveTileController tile)
+        private void MoveUnitToTile(AbstractUnitController unit, MoveTileController tile)
         {
             gridManager.MoveUnitToTile(unit, tile);
         }

@@ -4,7 +4,7 @@ using UnitStats;
 using UnityEngine;
 
 [System.Serializable]
-public abstract class Unit
+public abstract class UnitData
 {
     //Unit Name
     [SerializeField]
@@ -33,18 +33,7 @@ public abstract class Unit
     public virtual float Movement { get { return movement.Value; } }
     public virtual float Detection { get { return detection.Value; } }
 
-    public Unit()
-    {
-        name = "Unit";
-        strength = new UnitStat();
-        precision = new UnitStat();
-        speed = new UnitStat();
-        armor = new UnitStat();
-        movement = new UnitStat();
-        detection = new UnitStat();
-    }
-
-    protected Unit(string name, float hp, float str, float prc, float spd, float arm, float mov, float detect) 
+    public UnitData(string name, float hp, float str, float prc, float spd, float arm, float mov, float detect) 
     {
         this.name = name;
         this.strength = new UnitStat(str);

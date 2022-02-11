@@ -29,9 +29,9 @@ namespace Manager
         }
 
         //update text for unit and turn display on
-        public void DisplayStatForUnit(Unit unit) 
+        public void DisplayStatForUnit(AbstractUnitController unit) 
         {       
-            nameText.text = unit.Name;
+            nameText.text = unit.UnitName;
             strengthText.text = unit.Strength.ToString();
             precisionText.text = unit.Precision.ToString();
             speedText.text = unit.Speed.ToString();

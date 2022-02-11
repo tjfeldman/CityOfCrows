@@ -265,5 +265,42 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 8554434249691910628, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: m_Delegates.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8554434249691910628, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: m_Delegates.Array.data[0].eventID
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8554434249691910628, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8554434249691910628, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8554434249691910628, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 4658878257042472859, guid: 00a5e0faa71f80e40a55e89589daf73e, type: 3}
+    - target: {fileID: 8554434249691910628, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8554434249691910628, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8554434249691910628, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8554434249691910628, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 8554434249691910628, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}

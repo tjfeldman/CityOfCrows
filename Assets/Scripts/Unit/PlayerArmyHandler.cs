@@ -5,18 +5,18 @@ using System;
 
 public class PlayerArmyHandler
 {
-    private List<Tuple<string, PlayerUnit>> playerArmy;//list of player units
-    public readonly ReadOnlyCollection<Tuple<string, PlayerUnit>> PlayerArmy;
+    private List<Tuple<string, PlayerUnitData>> playerArmy;//list of player units
+    public readonly ReadOnlyCollection<Tuple<string, PlayerUnitData>> PlayerArmy;
 
     public PlayerArmyHandler() 
     {
-        playerArmy = new List<Tuple<string, PlayerUnit>>();
+        playerArmy = new List<Tuple<string, PlayerUnitData>>();
         PlayerArmy = playerArmy.AsReadOnly();
 
         //load default army
         string prefab = "MainCharacter";
-        PlayerUnit mc = new PlayerUnit("MC", 15, 6, 6, 6, 0, 5, 5);
-        playerArmy.Add(new Tuple<string, PlayerUnit>(prefab, mc));
+        PlayerUnitData mc = new PlayerUnitData("MC", 15, 6, 6, 6, 0, 5, 5);
+        playerArmy.Add(new Tuple<string, PlayerUnitData>(prefab, mc));
     }
     
 }

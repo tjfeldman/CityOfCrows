@@ -5,7 +5,7 @@ using Manager;
 
 public class MoveTileController : AbstractTileController
 {
-    public UnitController Unit;
+    public AbstractUnitController Unit;
 
     void OnMouseDown() 
     {

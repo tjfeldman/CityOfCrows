@@ -83,9 +83,9 @@ namespace Manager
             }
         }
 
-        public void ShowMovementOptionsForUnit(UnitController unit)
+        public void ShowMovementOptionsForUnit(AbstractUnitController unit)
         {
-            int movement = (int)unit.Unit.Movement;
+            int movement = (int)unit.Movement;
             Vector2Int position = unit.GetPosition();
 
             validMovementOptions = new List<GameObject>();
@@ -110,10 +110,10 @@ namespace Manager
             validMovementOptions.Clear();//empty data so it's not being stored for no reason
         }
 
-        public void MoveUnitToTile(UnitController unit, AbstractTileController tile)
+        public void MoveUnitToTile(AbstractUnitController unit, AbstractTileController tile)
         {
             Vector2Int tilePos = tile.GetPosition();
-            unit.gameObject.transform.position = new Vector3(tilePos.x, tilePos.y);
+            unit.gameObject.transform.parent.position = new Vector3(tilePos.x, tilePos.y);
             unit.SetPosition(tilePos.x, tilePos.y);
             CloseMovementOptionsForUnit(unit);
         }
@@ -189,7 +189,7 @@ namespace Manager
             return startingDirection != oppositeDirection;
         }
 
-        private void CloseMovementOptionsForUnit(UnitController unit) 
+        private void CloseMovementOptionsForUnit(AbstractUnitController unit) 
         {
             foreach (GameObject movementTile in movementTiles) 
             {
@@ -204,12 +204,22 @@ namespace Manager
             int y = position.y;
 
             playerArmyHandler = new PlayerArmyHandler();
-            Tuple<string, PlayerUnit> playerInfo = playerArmyHandler.PlayerArmy[0]; 
+            Tuple<string, PlayerUnitData> playerInfo = playerArmyHandler.PlayerArmy[0]; 
             GameObject prefab = Resources.Load(playerInfo.Item1) as GameObject;
-            GameObject unit = Instantiate(prefab, new Vector3(x,y), Quaternion.identity); //set Z to 1 so it shows over tile
-            PlayerUnit pc = playerInfo.Item2;
-            unit.GetComponent<UnitController>().SetPosition(x,y);
-            unit.GetComponent<UnitController>().SetUnit(pc);
+            GameObject unit = Instantiate(prefab, new Vector3(x,y,0), Quaternion.identity); //set Z to 1 so it shows over tile
+            unit.transform.parent = transform;
+            PlayerUnitController pc = unit.GetComponentInChildren<PlayerUnitController>();
+            PlayerUnitData data = playerInfo.Item2;
+
+            Debug.Log("Data = " + data);
+
+            pc.setStrength(data.Strength);
+            pc.setPrecision(data.Precision);
+            pc.setSpeed(data.Speed);
+            pc.setArmor(data.Armor);
+            pc.setMovement(data.Movement);
+            pc.setDetection(data.Precision);
+            pc.SetPosition(x,y);
         }
     }
 }

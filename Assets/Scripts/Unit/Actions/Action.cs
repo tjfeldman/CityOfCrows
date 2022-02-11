@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Actions {
     public abstract class Action : MonoBehaviour
     {
-        public UnitController Unit;
+        public PlayerUnitController Unit;
 
         protected abstract void OnMouseDown();
     }

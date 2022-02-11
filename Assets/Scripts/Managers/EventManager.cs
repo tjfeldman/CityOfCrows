@@ -12,8 +12,8 @@ public class EventManager : MonoBehaviour
         current = this;
     }
 
-    public event Action<UnitController> onUnitClicked;
-    public void UnitClicked(UnitController unit)
+    public event Action<AbstractUnitController> onUnitClicked;
+    public void UnitClicked(AbstractUnitController unit)
     {
         if (onUnitClicked != null)
         {
@@ -30,8 +30,8 @@ public class EventManager : MonoBehaviour
         }
     }
 
-    public event Action<UnitController> onShowMovement;
-    public void ShowMovementForUnit(UnitController unit) 
+    public event Action<AbstractUnitController> onShowMovement;
+    public void ShowMovementForUnit(AbstractUnitController unit) 
     {
         if (onShowMovement != null)
         {
@@ -40,8 +40,8 @@ public class EventManager : MonoBehaviour
 
     }
 
-    public event Action<UnitController, MoveTileController> onUnitMovement;
-    public void MoveUnitToTile(UnitController unit, MoveTileController tile) 
+    public event Action<AbstractUnitController, MoveTileController> onUnitMovement;
+    public void MoveUnitToTile(AbstractUnitController unit, MoveTileController tile) 
     {
         if (onUnitMovement != null)
         {
