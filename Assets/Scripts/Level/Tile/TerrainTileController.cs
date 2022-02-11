@@ -26,16 +26,14 @@ public class TerrainTileController : AbstractTileController
         }
     }
 
-    private DisplayManager displayManager;
-    public void setDisplayManager(DisplayManager displayManager) { this.displayManager = displayManager; }
-    
     void OnMouseDown() 
     {
-        Debug.Log("Tile: " + TileName);
-        if (displayManager != null) 
-        {
-            displayManager.CloseAllDisplays();
-        }
+        EventManager.current.TileClicked(this);
+    }
+
+    public override string ToString()
+    {
+        return TileName;
     }
 
 }

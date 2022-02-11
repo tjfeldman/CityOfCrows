@@ -47,7 +47,7 @@ namespace Generator
             {
                 GameObject child = spawner.gameObject;
 
-                SpawnType type = spawner.Type;
+                TeamType type = spawner.Type;
                 Vector2Int position = new Vector2Int((int)child.transform.position.x, (int)child.transform.position.y);
 
                 spawners.Add(new SpawnerData(type, position));

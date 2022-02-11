@@ -9,6 +9,6 @@ public class MoveTileController : AbstractTileController
 
     void OnMouseDown() 
     {
-        gridManager.MoveUnitToTile(Unit, this);
+        EventManager.current.MoveUnitToTile(Unit, this);
     }
 }

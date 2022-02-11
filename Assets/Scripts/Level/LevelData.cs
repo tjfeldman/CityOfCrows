@@ -124,8 +124,8 @@ public class TileData
 public class SpawnerData {
 
     [SerializeField]
-    private SpawnType type;
-    public virtual SpawnType Type {
+    private TeamType type;
+    public virtual TeamType Type {
         get {
             return type;
         }
@@ -139,7 +139,7 @@ public class SpawnerData {
         }
     }
 
-    public SpawnerData(SpawnType type, Vector2Int position) {
+    public SpawnerData(TeamType type, Vector2Int position) {
         this.type = type;
         this.position = position;
     }

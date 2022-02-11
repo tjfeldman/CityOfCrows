@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Manager
 {
@@ -70,13 +71,12 @@ namespace Manager
                 tileController.SpriteName = tile.SpriteName;
                 tileController.Size = size;
                 tileController.SetPosition(x,y);
-                tileController.setDisplayManager(gameManager.DisplayManager);
             }
 
             //spawn player and enemies
             foreach (SpawnerData spawner in level.Spawners) 
             {
-                if (spawner.Type == SpawnType.Player) 
+                if (spawner.Type == TeamType.Player) 
                 {
                     SpawnPlayerAt(spawner.Position);
                 }
@@ -102,7 +102,6 @@ namespace Manager
                 GameObject movementTile = Instantiate(MoveTile, new Vector3(tilePos.x, tilePos.y, tileZ-1), Quaternion.identity);
                 movementTile.GetComponentInChildren<MoveTileController>().Unit = unit;
                 movementTile.GetComponentInChildren<MoveTileController>().SetPosition(tilePos.x, tilePos.y);
-                movementTile.GetComponentInChildren<MoveTileController>().SetGridManager(this);
                 movementTile.transform.parent = transform;
                 movementTile.gameObject.name = "Movement Tile (X: " + tilePos.x.ToString() + ", Y: " + tilePos.y.ToString() + ")";
                 movementTiles.Add(movementTile);
@@ -211,8 +210,6 @@ namespace Manager
             PlayerUnit pc = playerInfo.Item2;
             unit.GetComponent<UnitController>().SetPosition(x,y);
             unit.GetComponent<UnitController>().SetUnit(pc);
-            unit.GetComponent<UnitController>().SetGridManager(this);
-            unit.GetComponent<UnitController>().setDisplayManager(gameManager.DisplayManager);;
         }
     }
 }

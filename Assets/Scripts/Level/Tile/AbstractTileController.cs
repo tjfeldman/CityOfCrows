@@ -19,7 +19,4 @@ public abstract class AbstractTileController : MonoBehaviour
     {
         return new Vector2Int(posX, posY);
     }
-
-    protected GridManager gridManager;
-    public void SetGridManager(GridManager gridManager) { this.gridManager = gridManager; }
 }
