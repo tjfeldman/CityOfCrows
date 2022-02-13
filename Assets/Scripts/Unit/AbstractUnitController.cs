@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnitStats;
+using Actions;
 
 public abstract class AbstractUnitController : MonoBehaviour
 {
@@ -34,22 +35,64 @@ public abstract class AbstractUnitController : MonoBehaviour
     public virtual float Movement { get { return movement.Value; }}
     public virtual float Detection { get { return detection.Value; }}
 
-    //position variables
-    private int posX;
-    private int posY;
-    public void SetPosition(int x, int y)
-    {
-        posX = x;
-        posY = y;
+    //Actions
+    protected bool action = true;
+    protected bool move = true;
+    protected bool free = true;
+
+    public bool HasMove() { return move; }
+    public bool HasAction() { return action; }
+    public bool HasFreeAction() { return free; }
+    public bool CanAct() {
+        return move || action || free;
     }
+
+    protected void Refresh() {
+        move = true;
+        action = true;
+        free = true;
+        this.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+    }
+
+    //position variables
+    protected AbstractTileController startTurnTile;
+    protected AbstractTileController currentTile;
 
     public Vector2Int GetPosition()
     {
-        return new Vector2Int(posX, posY);
+        return currentTile.GetPosition();
+    }
+
+    public void SetStartingTile(AbstractTileController tile)
+    {
+        startTurnTile = tile;
+        SetCurrentTile(tile);
+    }
+
+    public void SetCurrentTile(AbstractTileController tile)
+    {
+        currentTile = tile;
+    }
+
+    private void Start() 
+    {
+        //set up event listeners
+        EventManager.current.onUnitMovement += Moved;
+        EventManager.current.onUndoMovement += UndoMove;
+        EventManager.current.onUnitEndTurn += EndTurn;
+    }
+
+    private void OnDestroy() 
+    {
+        //remove event listeners
+        EventManager.current.onUnitMovement -= Moved;
+        EventManager.current.onUndoMovement -= UndoMove;
+        EventManager.current.onUnitEndTurn -= EndTurn;
     }
 
     private void OnMouseDown() 
     {
+        Debug.Log("You have clicked on Unit: " + ToString());
         EventManager.current.UnitClicked(this);
     }
 
@@ -58,4 +101,31 @@ public abstract class AbstractUnitController : MonoBehaviour
         return unitName + "(" + this.GetType()  + ")";
     }
 
+    public abstract List<UnitAction> GetActions();
+
+    private void Moved(AbstractUnitController unit, MoveTileController tile)
+    {
+        if (unit == this) {
+            move = false;
+            EventManager.current.UnitClicked(this);
+        }
+    }
+
+    private void UndoMove(AbstractUnitController unit, AbstractTileController tile)
+    {
+        if (unit == this) {
+            move = true;
+            EventManager.current.UnitClicked(this);
+        }
+    }
+
+    protected void EndTurn(AbstractUnitController unit) 
+    {
+        if (unit == this) {
+            move = false;
+            action = false;
+            free = false;
+            this.gameObject.GetComponent<SpriteRenderer>().color = Color.grey;
+        }
+    }
 }

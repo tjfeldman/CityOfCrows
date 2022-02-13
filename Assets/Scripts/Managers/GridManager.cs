@@ -24,14 +24,22 @@ namespace Manager
         private int height;
         private int tileZ = 1; //set to 1 so every character is shown over it.
 
-        private GameManager gameManager;
         private GameObject[,] gameGrid;
         private List<GameObject> validMovementOptions;
         private List<GameObject> movementTiles;
         private PlayerArmyHandler playerArmyHandler;
 
-        public void SetGameManager(GameManager gameManager) {
-            this.gameManager = gameManager;
+        private void Start()
+        {
+            EventManager.current.onUnitMovement += MoveUnitToTile;
+            EventManager.current.onUndoMovement += MoveUnitToTile;
+        }
+
+        private void OnDestroy()
+        {
+            EventManager.current.onUnitMovement -= MoveUnitToTile;
+            EventManager.current.onUndoMovement -= MoveUnitToTile;
+            
         }
 
         public void CreateLevel(LevelData level)
@@ -110,11 +118,11 @@ namespace Manager
             validMovementOptions.Clear();//empty data so it's not being stored for no reason
         }
 
-        public void MoveUnitToTile(AbstractUnitController unit, AbstractTileController tile)
+        private void MoveUnitToTile(AbstractUnitController unit, AbstractTileController tile)
         {
             Vector2Int tilePos = tile.GetPosition();
             unit.gameObject.transform.parent.position = new Vector3(tilePos.x, tilePos.y);
-            unit.SetPosition(tilePos.x, tilePos.y);
+            unit.SetCurrentTile(gameGrid[tilePos.x,tilePos.y].GetComponentInChildren<AbstractTileController>());
             CloseMovementOptionsForUnit(unit);
         }
 
@@ -189,7 +197,7 @@ namespace Manager
             return startingDirection != oppositeDirection;
         }
 
-        private void CloseMovementOptionsForUnit(AbstractUnitController unit) 
+        public void CloseMovementOptionsForUnit(AbstractUnitController unit) 
         {
             foreach (GameObject movementTile in movementTiles) 
             {
@@ -219,7 +227,8 @@ namespace Manager
             pc.setArmor(data.Armor);
             pc.setMovement(data.Movement);
             pc.setDetection(data.Precision);
-            pc.SetPosition(x,y);
+            
+            pc.SetStartingTile(gameGrid[x,y].GetComponentInChildren<AbstractTileController>());
         }
     }
 }

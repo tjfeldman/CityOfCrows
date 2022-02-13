@@ -3,12 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Actions {
-    public class MoveAction : Action
+    public class MoveAction : UnitAction
     {
-        protected override void OnMouseDown()
+        public MoveAction(AbstractUnitController unit) : base(unit) {}
+
+        public override void DoAction()
         {
-            Debug.Log("Move Action for " + Unit.ToString() + " pressed");
-            EventManager.current.ShowMovementForUnit(Unit);
+            Debug.Log("Move Action for " + Unit.ToString());
+            EventManager.current.MovementActionForUnit(Unit);
+        }
+
+        public override Texture2D GetTexture()
+        {
+            return Resources.Load("Sprites/Move") as Texture2D;
         }
     }
 }

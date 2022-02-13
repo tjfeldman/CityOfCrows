@@ -30,12 +30,12 @@ public class EventManager : MonoBehaviour
         }
     }
 
-    public event Action<AbstractUnitController> onShowMovement;
-    public void ShowMovementForUnit(AbstractUnitController unit) 
+    public event Action<AbstractUnitController> onMovementAction;
+    public void MovementActionForUnit(AbstractUnitController unit) 
     {
-        if (onShowMovement != null)
+        if (onMovementAction != null)
         {
-            onShowMovement(unit);
+            onMovementAction(unit);
         }
 
     }
@@ -46,6 +46,24 @@ public class EventManager : MonoBehaviour
         if (onUnitMovement != null)
         {
             onUnitMovement(unit, tile);
+        }
+    }
+
+    public event Action<AbstractUnitController, AbstractTileController> onUndoMovement;
+    public void UndoMovement(AbstractUnitController unit, AbstractTileController tile)
+    {
+        if (onUndoMovement != null)
+        {
+            onUndoMovement(unit, tile);
+        }
+    }
+
+    public event Action<AbstractUnitController> onUnitEndTurn;
+    public void UnitEndTurn(AbstractUnitController unit)
+    {
+        if (onUnitEndTurn != null)
+        {
+            onUnitEndTurn(unit);
         }
     }
 }

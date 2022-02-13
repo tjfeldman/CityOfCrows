@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2914434399926865278}
   - component: {fileID: 6009524098864880123}
   - component: {fileID: 3305447264003667705}
+  - component: {fileID: 381610624080109114}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -77,7 +78,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 4ac008fa1a3a8414fbed2b8b7239f578, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7632c91f7f207164c8fd68780974e4cd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -114,6 +115,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &381610624080109114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1596370569097795708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30b0429ab125cd4459337af80b6fb0a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6973094686087108914
 GameObject:
   m_ObjectHideFlags: 0
@@ -124,7 +137,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6820431968517477164}
   m_Layer: 0
-  m_Name: MoveButton
+  m_Name: ActionButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
