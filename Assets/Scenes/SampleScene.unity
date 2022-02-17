@@ -222,6 +222,10 @@ PrefabInstance:
       value: 1080
       objectReference: {fileID: 0}
     - target: {fileID: 894616812895543178, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 519420031}
+    - target: {fileID: 894616812895543178, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
       propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}

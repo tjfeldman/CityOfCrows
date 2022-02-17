@@ -20,8 +20,7 @@ namespace Manager
             }
         }
 
-        // Start is called before the first frame update
-        void Start()
+        void Awake()
         {
             army = new List<GameObject>();
             if (UnitObj == null) {

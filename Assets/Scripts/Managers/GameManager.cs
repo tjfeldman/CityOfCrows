@@ -20,7 +20,6 @@ namespace Manager
 {
     public class GameManager : MonoBehaviour
     {
-        private Camera mainCamera;
         private GridManager gridManager;
         private DisplayManager displayManager;
         private PlayerArmyManager playerArmyManager;
@@ -50,12 +49,11 @@ namespace Manager
         // Start is called before the first frame update
         void Start()
         {
-            mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
             //set up display manager
             displayManager = this.GetComponentInChildren<DisplayManager>();
             if (displayManager != null) 
             {
-                displayManager.SetWorldCamera(mainCamera);
+                //do stuff here?
             } 
             else 
             {

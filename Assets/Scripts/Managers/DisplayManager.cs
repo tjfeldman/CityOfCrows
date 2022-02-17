@@ -23,13 +23,14 @@ namespace Manager
 
         private Text turnText;
 
-        void Start()
+        void Awake()
         {
             width = this.gameObject.GetComponent<Canvas>().pixelRect.width;
             height = this.gameObject.GetComponent<Canvas>().pixelRect.height;
 
             StatDisplay = GameObject.Find("StatDisplay");
             TurnDisplay = GameObject.Find("TurnDisplay");
+            center = TurnDisplay.transform.position;
             // turnDisplayWidth = TurnDisplay.GetComponent<Image>().rectTransform.rect.width / this.gameObject.GetComponent<Canvas>().referencePixelsPerUnit;
 
             nameText = GameObject.Find("UnitName").GetComponent<Text>();
@@ -43,13 +44,6 @@ namespace Manager
 
             StatDisplay.SetActive(false);
             TurnDisplay.SetActive(false);
-        }
-
-        public void SetWorldCamera(Camera camera) 
-        {
-            this.gameObject.GetComponent<Canvas>().worldCamera = camera;
-            //The Turn Display is set to be in the center by default, so once the worldCamera is set, we can figure out the center by getting it's position
-            center = TurnDisplay.transform.position;
         }
 
         public void CloseDisplay() {

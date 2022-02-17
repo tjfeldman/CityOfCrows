@@ -39,7 +39,7 @@ namespace Manager
         private List<SpawnerData> playerSpawns;
         private List<GameObject> movementTiles;
 
-        private void Start()
+        private void Awake()
         {
             //define these lists to prevent future errors
             playerSpawns = new List<SpawnerData>();
