@@ -15,18 +15,18 @@ namespace Generator
             List<TileData> tiles = new List<TileData>();
             List<SpawnerData> spawners = new List<SpawnerData>();
             
-            foreach (TerrainTileController tile in this.GetComponentsInChildren<TerrainTileController>())
+            foreach (TileBuilder tile in this.GetComponentsInChildren<TileBuilder>())
             {
                 string tileName = tile.TileName;
                 int movementCost = tile.MovementCost;
                 int detectionPenalty = tile.DetectionPenalty;
-                float size = tile.Size;
+                Vector2Int size = tile.Size;
 
                 GameObject child = tile.gameObject;
                 string spriteName = child.GetComponentInChildren<SpriteRenderer>().sprite.name;
                 //need to remove half the size from the x and y since the bottom left corner is the real position of the tile
-                float x = child.transform.position.x - size/2f;
-                float y = child.transform.position.y - size/2f;
+                float x = child.transform.position.x - size.x/2f;
+                float y = child.transform.position.y - size.y/2f;
                 Vector2Int position = new Vector2Int((int)x, (int)y);
 
                 tiles.Add(new TileData(tileName, movementCost, detectionPenalty, spriteName, position, size));

@@ -8,7 +8,6 @@ public abstract class AbstractUnitController : MonoBehaviour
 {
     //Unit Name
     protected string unitName;
-    public void setName(string name) { unitName = name; }
     public virtual string UnitName { get { return unitName; }}
 
     //Stats
@@ -18,14 +17,6 @@ public abstract class AbstractUnitController : MonoBehaviour
     protected UnitStat armor;
     protected UnitStat movement;
     protected UnitStat detection;
-
-    //stat setters
-    public void setStrength(float value) { strength = new UnitStat(value); }
-    public void setPrecision(float value) { precision = new UnitStat(value); }
-    public void setSpeed(float value) { speed = new UnitStat(value); }
-    public void setArmor(float value) { armor = new UnitStat(value); }
-    public void setMovement(float value) { movement = new UnitStat(value); }
-    public void setDetection(float value) { detection = new UnitStat(value); }
 
     //stat getters
     public virtual float Strength { get { return strength.Value; }}
@@ -40,18 +31,11 @@ public abstract class AbstractUnitController : MonoBehaviour
     protected bool move = true;
     protected bool free = true;
 
-    public bool HasMove() { return move; }
+    public bool HasMove() { return move && Movement > 0; } //if unit has no movement then they can't move.
     public bool HasAction() { return action; }
     public bool HasFreeAction() { return free; }
     public bool CanAct() {
         return move || action || free;
-    }
-
-    protected void Refresh() {
-        move = true;
-        action = true;
-        free = true;
-        this.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
     }
 
     //position variables
@@ -63,15 +47,31 @@ public abstract class AbstractUnitController : MonoBehaviour
         return currentTile.GetPosition();
     }
 
+    //TODO Better initilaze and manage these variables
     public void SetStartingTile(AbstractTileController tile)
     {
         startTurnTile = tile;
-        SetCurrentTile(tile);
+        currentTile = tile;
     }
 
     public void SetCurrentTile(AbstractTileController tile)
     {
         currentTile = tile;
+    }
+
+    public void LoadPlayerData(PlayerUnitData data)
+    {
+        unitName = data.Name;
+        strength = new UnitStat(data.Strength);
+        precision = new UnitStat(data.Precision);
+        speed = new UnitStat(data.Speed);
+        armor = new UnitStat(data.Armor);
+        movement = new UnitStat(data.Movement);
+        detection = new UnitStat(data.Detection);
+
+        this.gameObject.GetComponent<SpriteRenderer>().sprite = Utilities.GetSpriteByName(data.Sprite);
+
+        Debug.Log("Done Loading \"" + unitName + "\"");
     }
 
     private void Start() 
@@ -80,6 +80,7 @@ public abstract class AbstractUnitController : MonoBehaviour
         EventManager.current.onUnitMovement += Moved;
         EventManager.current.onUndoMovement += UndoMove;
         EventManager.current.onUnitEndTurn += EndTurn;
+        EventManager.current.onUnitRefresh += Refresh;
     }
 
     private void OnDestroy() 
@@ -88,6 +89,7 @@ public abstract class AbstractUnitController : MonoBehaviour
         EventManager.current.onUnitMovement -= Moved;
         EventManager.current.onUndoMovement -= UndoMove;
         EventManager.current.onUnitEndTurn -= EndTurn;
+        EventManager.current.onUnitRefresh -= Refresh;
     }
 
     private void OnMouseDown() 
@@ -116,6 +118,17 @@ public abstract class AbstractUnitController : MonoBehaviour
         if (unit == this) {
             move = true;
             EventManager.current.UnitClicked(this);
+        }
+    }
+
+    protected void Refresh(AbstractUnitController unit) 
+    {
+        if (unit == this) {
+            move = true;
+            action = true;
+            free = true;
+            this.startTurnTile = this.currentTile;
+            this.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
         }
     }
 

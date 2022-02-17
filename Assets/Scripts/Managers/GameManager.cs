@@ -10,33 +10,52 @@ using Actions;
 public enum TeamType 
 {
     None=-1,
-    Player=0,
-    Enemy=2,
-    Ally=3,
+    Player,
+    Enemy,
+    Ally,
+    EndOfTeams,
 }
 
 namespace Manager
 {
     public class GameManager : MonoBehaviour
     {
-        public TextAsset LevelJSON;
-
+        private Camera mainCamera;
         private GridManager gridManager;
         private DisplayManager displayManager;
+        private PlayerArmyManager playerArmyManager;
+        //enemy manager
+        private bool noAllies = true;//ally manager
 
         private TeamType currentTurn = TeamType.None;
+
+        [System.Serializable]
+        private class TeamColor {
+            public TeamType Team;
+            public Color Color;
+
+            public TeamColor(TeamType team, Color color)
+            {
+                this.Team = team;
+                this.Color = color;
+            }
+        }
+        [SerializeField]
+        private List<TeamColor> teamColors;
         
         private AbstractUnitController activeUnit = null; 
+        //List of Action Buttons being displayed
+        private List<GameObject> actionButtons = new List<GameObject>();
 
         // Start is called before the first frame update
         void Start()
         {
+            mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
             //set up display manager
             displayManager = this.GetComponentInChildren<DisplayManager>();
             if (displayManager != null) 
             {
-                this.GetComponentInChildren<Canvas>().worldCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
-                displayManager.CloseAllDisplays();
+                displayManager.SetWorldCamera(mainCamera);
             } 
             else 
             {
@@ -44,26 +63,21 @@ namespace Manager
                 return;
             }
 
+            //set up player army manager
+            playerArmyManager = this.GetComponentInChildren<PlayerArmyManager>();
+            if (playerArmyManager == null) 
+            {
+                Debug.Log("Unable to Find Player Army Manager");
+                return;
+            }
+
             //set up grid manager
             gridManager = this.GetComponentInChildren<GridManager>();
             if (gridManager != null) 
             {
-                //todo
+                gridManager.SpawnPlayerArmy(playerArmyManager.Army);
             } else {
                 Debug.LogError("Unable To Find the Grid Manager");
-                return;
-            }
-
-            if (LevelJSON != null) 
-            {
-                Debug.Log(LevelJSON.text);
-                //find grid manager and start generating grid
-                LevelData data = JsonUtility.FromJson<LevelData>(LevelJSON.text);
-                gridManager.CreateLevel(data);
-            } 
-            else 
-            {
-                Debug.LogError("No Level Json was loaded. Cannot Load Level");
                 return;
             }
 
@@ -72,15 +86,28 @@ namespace Manager
             EventManager.current.onTileClicked += OnTileClicked;
             EventManager.current.onMovementAction += MovementActionForUnit;
             EventManager.current.onUnitEndTurn += EndUnitTurn;
+            EventManager.current.onTurnTransitionOver += SetTurnToTeam;
 
-            //set current turn to player
             SetTurnToTeam(TeamType.Player);
         }
 
         // Update is called once per frame
         void Update()
         {
-            
+            if (currentTurn == TeamType.Player)
+            {
+                //Update during the player turn
+                if (!playerArmyManager.CanArmyAct())
+                {
+                    //if the player army cannot act, time to change the turn team
+                    changeTurnTeam();
+                }
+            }
+            else if (currentTurn == TeamType.Enemy)
+            {
+                //TODO
+                changeTurnTeam();
+            }
         }
 
         private void OnDestroy() 
@@ -90,12 +117,44 @@ namespace Manager
             EventManager.current.onTileClicked -= OnTileClicked;
             EventManager.current.onMovementAction -= MovementActionForUnit;
             EventManager.current.onUnitEndTurn -= EndUnitTurn;
+            EventManager.current.onTurnTransitionOver -= SetTurnToTeam;
+        }
+
+        private void changeTurnTeam()
+        {
+            TeamType previousTurn = currentTurn;
+            TeamType nextTurn = currentTurn + 1;
+            currentTurn = TeamType.None;//set to none during transition
+            //set back to player if there are no allies
+            if (noAllies && nextTurn == TeamType.Ally) {
+                nextTurn = TeamType.Player;
+            }
+            //set back to player if there are no more next teams
+            else if (nextTurn == TeamType.EndOfTeams) {
+                nextTurn = TeamType.Player;
+            }
+
+            //refresh army of the current team
+            if (previousTurn == TeamType.Player) {
+                //refresh player units
+                EventManager.current.RefreshArmy(playerArmyManager);
+            }
+
+            Color color = Color.white;//default to white if no team color was set
+            foreach (TeamColor teamColor in teamColors) {
+                if (teamColor.Team == nextTurn) {
+                    color = teamColor.Color;
+                    break;
+                }
+            }
+
+            displayManager.TurnTransitionForTeam(nextTurn, color);
         }
 
         private void SetTurnToTeam(TeamType team) 
         {
-            //todo show animation of whose turn it is
             currentTurn = team;
+            Debug.Log("It is now the " + team.ToString() + " turn");
         }
 
         //Turns off displays for active unit is one exists
@@ -103,7 +162,8 @@ namespace Manager
         {
             if (activeUnit) 
             {
-                displayManager.CloseButtonDisplays();
+                RemoveActionButtons();
+                displayManager.CloseDisplay();
                 gridManager.CloseMovementOptionsForUnit(activeUnit);
                 activeUnit = null;
             }
@@ -126,6 +186,7 @@ namespace Manager
                     Vector2Int position = unit.GetPosition();
                     List<UnitAction> actions = unit.GetActions();
                     bool even = actions.Count % 2 == 0;
+                    //TODO: Buttons could appear off screen depending on where the player is. Should handle that.
                     float offset =  even ? 0.75f : 0.0f;//For even numbers we want to add a 0.75 offset from the center. For odd numbers we can place the odd button in the center
                     int above = (int)Math.Ceiling(actions.Count / 2.0f);//the number of buttons above the unit's y position should be half of them (rounded up)
                     float top = (offset + ((above - 1) * 1.5f)) + position.y;//The top position is the offset + 1.5f for each button besides the first one plus the y position
@@ -135,7 +196,7 @@ namespace Manager
                         //we place the buttons starting from the top and going down 1.5f for each one after
                         GameObject button = Instantiate(buttonPrefab, new Vector3(position.x + 1.5f, top - (x * 1.5f), -1), Quaternion.identity);
                         button.gameObject.GetComponentInChildren<ActionController>().SetAction(actions[x]);
-                        displayManager.AddButtonToDisplay(button);
+                        actionButtons.Add(button);
                     }
                 }
             }
@@ -147,7 +208,7 @@ namespace Manager
             {
                 ResetActiveUnit();
                 Debug.Log("Tile: " + tile);
-                displayManager.CloseAllDisplays();
+                //to do show tile display
             }
         }
 
@@ -155,19 +216,25 @@ namespace Manager
         private void MovementActionForUnit(AbstractUnitController unit)
         {
             Debug.Log("Doing movement action for unit: " + unit);
-            if (typeof(PlayerUnitController).IsInstanceOfType(unit))
+            if (typeof(PlayerUnitController).IsInstanceOfType(unit) && unit == activeUnit)
             {
-                displayManager.CloseButtonDisplays();
-                displayManager.CloseAllDisplays();
-                gridManager.ShowMovementOptionsForUnit(unit);
+                RemoveActionButtons();
+                gridManager.ShowMovementOptionsForPlayerUnit((PlayerUnitController)unit);
             }
             //TO DO Enemy and Ally movement
+        }
+
+        private void RemoveActionButtons() 
+        {
+            foreach (GameObject button in actionButtons) {
+                Destroy(button);
+            }
+            actionButtons.Clear();
         }
 
         private void EndUnitTurn(AbstractUnitController unit)
         {
             ResetActiveUnit();
-            displayManager.CloseAllDisplays();
         }
     }
 }

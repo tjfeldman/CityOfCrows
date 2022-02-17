@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4953638145151212121}
   - component: {fileID: 6650491948139046223}
   - component: {fileID: 5877196355294520168}
-  - component: {fileID: 4690295356075368059}
+  - component: {fileID: 5345716851257141454}
   m_Layer: 0
   m_Name: GrassSprite
   m_TagString: Untagged
@@ -110,7 +110,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &4690295356075368059
+--- !u!114 &5345716851257141454
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -119,14 +119,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 6784740556927654110}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd70fb691d9919a4c93b08871fd7b6f6, type: 3}
+  m_Script: {fileID: 11500000, guid: 56f7fe1347b341b43b88077caa7d4e06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TileName: Grass
+  TileName: Tile
   MovementCost: 1
   DetectionPenalty: 0
-  Sprite: {fileID: 0}
-  Position: {x: 0, y: 0}
+  Size: {x: 1, y: 1}
 --- !u!1 &8790223404976371498
 GameObject:
   m_ObjectHideFlags: 0

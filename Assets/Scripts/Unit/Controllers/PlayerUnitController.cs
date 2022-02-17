@@ -9,11 +9,12 @@ public class PlayerUnitController : AbstractUnitController
     {
         List<UnitAction> actions = new List<UnitAction>();
 
+        //TODO: Have generic action lists in Abstract Unit Controller?
         if (CanAct()) 
         {
             if (HasMove()) {
                 actions.Add(new MoveAction(this));
-            } else {
+            } else if (Movement > 0) {
                 actions.Add(new UndoMoveAction(this, startTurnTile));
             }
 

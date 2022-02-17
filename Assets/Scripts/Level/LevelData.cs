@@ -100,15 +100,15 @@ public class TileData
     }
 
     [SerializeField]
-    private float size;
-    public virtual float Size {
+    private Vector2Int size;
+    public virtual Vector2Int Size {
         get {
             return size;
         }
     }
 
 
-    public TileData(string tileName, int movementCost, int detectionPenalty, string spriteName, Vector2Int position, float size)
+    public TileData(string tileName, int movementCost, int detectionPenalty, string spriteName, Vector2Int position, Vector2Int size)
     {
         this.tileName = tileName;
         this.movementCost = movementCost;

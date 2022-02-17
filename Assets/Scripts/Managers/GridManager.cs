@@ -9,6 +9,11 @@ namespace Manager
 {
     public class GridManager : MonoBehaviour
     {
+        //Z values for tiles and units
+        private const float GRID_TILE_Z = 1.0f;
+        private const float MOVE_TILE_Z = 0.5f;
+        private const float UNIT_Z = 0.0f;
+
         private enum Direction
         {
             UP=1,
@@ -17,20 +22,42 @@ namespace Manager
             RIGHT=4,
         }
 
-        public GameObject Tile;
-        public GameObject MoveTile;
+        public virtual int Width { get { return levelData.Width; }}
+        public virtual int Height { get { return levelData.Height; }}
 
-        private int width;
-        private int height;
-        private int tileZ = 1; //set to 1 so every character is shown over it.
-
+        [SerializeField]
+        private TextAsset LevelJSON;
+        [SerializeField]
+        private GameObject Tile;
+        [SerializeField]
+        private GameObject MoveTile;
+        [SerializeField]
+        private GameObject PlayerUnit;
+       
+        private LevelData levelData;
         private GameObject[,] gameGrid;
-        private List<GameObject> validMovementOptions;
+        private List<SpawnerData> playerSpawns;
         private List<GameObject> movementTiles;
-        private PlayerArmyHandler playerArmyHandler;
 
         private void Start()
         {
+            //define these lists to prevent future errors
+            playerSpawns = new List<SpawnerData>();
+            movementTiles = new List<GameObject>();
+
+            if (LevelJSON != null) 
+            {
+                Debug.Log(LevelJSON.text);
+                //find grid manager and start generating grid
+                levelData = JsonUtility.FromJson<LevelData>(LevelJSON.text);
+                CreateLevel();
+            } 
+            else 
+            {
+                Debug.LogError("No Level Json was loaded. Cannot Load Level");
+                return;
+            }
+
             EventManager.current.onUnitMovement += MoveUnitToTile;
             EventManager.current.onUndoMovement += MoveUnitToTile;
         }
@@ -42,26 +69,26 @@ namespace Manager
             
         }
 
-        public void CreateLevel(LevelData level)
+        private void CreateLevel()
         {
-            width = level.Width;
-            height = level.Height;
+            int width = levelData.Width;
+            int height = levelData.Height;
             gameGrid = new GameObject[width, height];
 
-            foreach (TileData tile in level.Tiles)
+            foreach (TileData tile in levelData.Tiles)
             {
                 int x = tile.Position.x;
                 int y = tile.Position.y;
-                float size = tile.Size;
+                Vector2Int size = tile.Size;
 
-                GameObject newTile = Instantiate(Tile, new Vector3(x, y, tileZ), Quaternion.identity);
+                GameObject newTile = Instantiate(Tile, new Vector3(x, y, GRID_TILE_Z), Quaternion.identity);
                 newTile.transform.parent = transform;
                 newTile.gameObject.name = tile.TileName + " (X: " + x.ToString() + ", Y: " + y.ToString() + ")";
 
-                if (size > 1) {
-                    //for larger tiles we need to add extra data to the game grid
-                    for (int additionalX = 0; additionalX < size; additionalX++) {
-                        for (int additionalY = 0; additionalY < size; additionalY++) {
+                //for tiles larger than 1x1 we need to add extra data to the gameGrid
+                if (size.x > 1 || size.y > 1) {
+                    for (int additionalX = 0; additionalX < size.x; additionalX++) {
+                        for (int additionalY = 0; additionalY < size.y; additionalY++) {
                             int newX = x + additionalX;
                             int newY = y + additionalY;
                             gameGrid[newX,newY] = newTile;
@@ -73,50 +100,62 @@ namespace Manager
                 }
 
                 TerrainTileController tileController = newTile.GetComponentInChildren<TerrainTileController>();
-                tileController.TileName = tile.TileName;
-                tileController.MovementCost = tile.MovementCost;
-                tileController.DetectionPenalty = tile.DetectionPenalty;
-                tileController.SpriteName = tile.SpriteName;
-                tileController.Size = size;
+                tileController.LoadTileData(tile);
                 tileController.SetPosition(x,y);
             }
 
-            //spawn player and enemies
-            foreach (SpawnerData spawner in level.Spawners) 
-            {
-                if (spawner.Type == TeamType.Player) 
-                {
-                    SpawnPlayerAt(spawner.Position);
+            foreach (SpawnerData spawner in levelData.Spawners) {
+                if (spawner.Type == TeamType.Player) {
+                    playerSpawns.Add(spawner);
                 }
             }
         }
 
-        public void ShowMovementOptionsForUnit(AbstractUnitController unit)
+        public void SpawnPlayerArmy(ReadOnlyCollection<GameObject> army) 
         {
-            int movement = (int)unit.Movement;
-            Vector2Int position = unit.GetPosition();
-
-            validMovementOptions = new List<GameObject>();
-            for (int i = (int)Direction.UP; i <= (int)Direction.RIGHT; i++)
-            {
-                checkValidMovementInDirection(validMovementOptions, (Direction)i, position, (Direction)i, movement);
+            //if army is larger than number of player spawns output warning
+            if (army.Count > playerSpawns.Count) {
+                Debug.LogWarning("Army is bigger than the number of spawns");
             }
 
+            for (int i = 0; i < army.Count && i < playerSpawns.Count; i++) {
+                GameObject unit = army[i];
+                SpawnerData spawner = playerSpawns[i];
+                int x = spawner.Position.x;
+                int y = spawner.Position.y;
+
+                // GameObject unit = Instantiate(PlayerUnit, new Vector3(x,y,UNIT_Z), Quaternion.identity); //set Z to 1 so it shows over tile
+                unit.transform.position = new Vector3(x,y,UNIT_Z);
+                unit.transform.parent = transform;
+                PlayerUnitController pc = unit.GetComponentInChildren<PlayerUnitController>();                
+                pc.SetStartingTile(gameGrid[x,y].GetComponentInChildren<AbstractTileController>());
+                unit.name = pc.ToString();
+            }
+        }
+
+        public void ShowMovementOptionsForPlayerUnit(PlayerUnitController unit)
+        {
+            List<GameObject> validMovementOptions = GetMovementOptionsForUnit(unit);
             //draw valid movement options
-            movementTiles = new List<GameObject>();
             foreach (GameObject tile in validMovementOptions) 
             {
                 Vector2Int tilePos = tile.GetComponentInChildren<TerrainTileController>().GetPosition();
-                GameObject movementTile = Instantiate(MoveTile, new Vector3(tilePos.x, tilePos.y, tileZ-1), Quaternion.identity);
+                GameObject movementTile = Instantiate(MoveTile, new Vector3(tilePos.x, tilePos.y, MOVE_TILE_Z), Quaternion.identity);
                 movementTile.GetComponentInChildren<MoveTileController>().Unit = unit;
                 movementTile.GetComponentInChildren<MoveTileController>().SetPosition(tilePos.x, tilePos.y);
                 movementTile.transform.parent = transform;
                 movementTile.gameObject.name = "Movement Tile (X: " + tilePos.x.ToString() + ", Y: " + tilePos.y.ToString() + ")";
                 movementTiles.Add(movementTile);
             }
-
-            validMovementOptions.Clear();//empty data so it's not being stored for no reason
         }
+
+        /*
+        FUTURE FUNCTION
+        public void GetMovementOptionsForEnemyUnit(EnemyUnitController unit)
+        {
+
+        }
+        */
 
         private void MoveUnitToTile(AbstractUnitController unit, AbstractTileController tile)
         {
@@ -126,6 +165,22 @@ namespace Manager
             CloseMovementOptionsForUnit(unit);
         }
 
+        //Checks for all possible movement options for unit
+        private List<GameObject> GetMovementOptionsForUnit(AbstractUnitController unit)
+        {
+            int movement = (int)unit.Movement;
+            Vector2Int position = unit.GetPosition();
+
+            List<GameObject> validMovementOptions = new List<GameObject>();
+            for (int i = (int)Direction.UP; i <= (int)Direction.RIGHT; i++)
+            {
+                checkValidMovementInDirection(validMovementOptions, (Direction)i, position, (Direction)i, movement);
+            }
+
+            return validMovementOptions;
+        }
+
+        //Recursive function that checks step by step in a single direction all possible movements in that direction from starting position
         private void checkValidMovementInDirection(List<GameObject> validMovementOptions, Direction startingDirection, Vector2Int position, Direction currentDirection, int movementLeft)
         {
             int x = position.x;
@@ -184,9 +239,10 @@ namespace Manager
             }
         }
 
+        //returns true if x and y exist within the grid
         private bool isValidTile(int x, int y)
         {
-            return (x >= 0 && x < width) && (y >= 0 && y < height);
+            return (x >= 0 && x < levelData.Width) && (y >= 0 && y < levelData.Height);
         }
 
         //return true if the direction is the opposite direction from starting direction
@@ -204,31 +260,6 @@ namespace Manager
                 Destroy(movementTile);
             }
             movementTiles.Clear();
-        }
-
-        private void SpawnPlayerAt(Vector2Int position)
-        {
-            int x = position.x;
-            int y = position.y;
-
-            playerArmyHandler = new PlayerArmyHandler();
-            Tuple<string, PlayerUnitData> playerInfo = playerArmyHandler.PlayerArmy[0]; 
-            GameObject prefab = Resources.Load(playerInfo.Item1) as GameObject;
-            GameObject unit = Instantiate(prefab, new Vector3(x,y,0), Quaternion.identity); //set Z to 1 so it shows over tile
-            unit.transform.parent = transform;
-            PlayerUnitController pc = unit.GetComponentInChildren<PlayerUnitController>();
-            PlayerUnitData data = playerInfo.Item2;
-
-            Debug.Log("Data = " + data);
-
-            pc.setStrength(data.Strength);
-            pc.setPrecision(data.Precision);
-            pc.setSpeed(data.Speed);
-            pc.setArmor(data.Armor);
-            pc.setMovement(data.Movement);
-            pc.setDetection(data.Precision);
-            
-            pc.SetStartingTile(gameGrid[x,y].GetComponentInChildren<AbstractTileController>());
         }
     }
 }

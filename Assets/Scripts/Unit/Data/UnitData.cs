@@ -24,6 +24,10 @@ public abstract class UnitData
     [SerializeField]
     protected UnitStat detection;
 
+    [SerializeField]
+    protected string sprite;
+    public virtual string Sprite { get { return sprite; }}
+
     //Stat Getters
     public virtual string Name { get { return name; } }
     public virtual float Strength { get { return strength.Value; } }
@@ -33,7 +37,7 @@ public abstract class UnitData
     public virtual float Movement { get { return movement.Value; } }
     public virtual float Detection { get { return detection.Value; } }
 
-    public UnitData(string name, float hp, float str, float prc, float spd, float arm, float mov, float detect) 
+    public UnitData(string name, float hp, float str, float prc, float spd, float arm, float mov, float detect, string sprite) 
     {
         this.name = name;
         this.strength = new UnitStat(str);
@@ -42,6 +46,7 @@ public abstract class UnitData
         this.armor = new UnitStat(arm);
         this.movement = new UnitStat(mov);
         this.detection = new UnitStat(detect);
+        this.sprite = sprite;
     }   
 
 }

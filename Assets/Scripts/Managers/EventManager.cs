@@ -66,4 +66,31 @@ public class EventManager : MonoBehaviour
             onUnitEndTurn(unit);
         }
     }
+
+    public event Action<AbstractUnitController> onUnitRefresh;
+    public void RefreshUnit(AbstractUnitController unit)
+    {
+        if (onUnitRefresh != null)
+        {
+            onUnitRefresh(unit);
+        }
+    }
+
+    public event Action<TeamType> onTurnTransitionOver;
+    public void TurnTransitionOver(TeamType team)
+    {
+        if (onTurnTransitionOver != null)
+        {
+            onTurnTransitionOver(team);
+        }
+    }
+
+    public event Action<Manager.AbstractArmyManager> onRefreshArmy;
+    public void RefreshArmy(Manager.AbstractArmyManager armyManager)
+    {
+        if (onRefreshArmy != null)
+        {
+            onRefreshArmy(armyManager);
+        }
+    }
 }
