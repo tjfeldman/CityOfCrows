@@ -15,6 +15,7 @@ namespace Manager
         private GameObject TurnDisplay;
 
         private Text nameText;
+        private Text healthText;
         private Text strengthText;
         private Text precisionText;
         private Text speedText;
@@ -34,6 +35,7 @@ namespace Manager
             // turnDisplayWidth = TurnDisplay.GetComponent<Image>().rectTransform.rect.width / this.gameObject.GetComponent<Canvas>().referencePixelsPerUnit;
 
             nameText = GameObject.Find("UnitName").GetComponent<Text>();
+            healthText = GameObject.Find("HealthValue").GetComponent<Text>();
             strengthText = GameObject.Find("StrengthValue").GetComponent<Text>();
             precisionText = GameObject.Find("PrecisionValue").GetComponent<Text>();
             speedText = GameObject.Find("SpeedValue").GetComponent<Text>();
@@ -54,6 +56,7 @@ namespace Manager
         public void DisplayStatForUnit(AbstractUnitController unit) 
         {       
             nameText.text = unit.UnitName;
+            healthText.text = unit.CurrentHealth + "/" + unit.MaxHealth;
             strengthText.text = unit.Strength.ToString();
             precisionText.text = unit.Precision.ToString();
             speedText.text = unit.Speed.ToString();

@@ -16,7 +16,7 @@ public class GeneratePlayerArmyJSON : MonoBehaviour
 
         PlayerArmyData data = new PlayerArmyData(playerArmy);
         string json = JsonUtility.ToJson(data);
-        string path = "Assets/Data/Unit/playerArmy.json";
+        string path = "Assets/Resources/Data/Unit/playerArmy.json";
 
         StreamWriter writer = new StreamWriter(path, false);
         writer.Write(json);

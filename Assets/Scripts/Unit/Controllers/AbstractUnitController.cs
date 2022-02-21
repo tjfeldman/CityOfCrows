@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnitStats;
 using Actions;
 
@@ -11,6 +12,7 @@ public abstract class AbstractUnitController : MonoBehaviour
     public virtual string UnitName { get { return unitName; }}
 
     //Stats
+    protected HealthSystem health;
     protected UnitStat strength;
     protected UnitStat precision;
     protected UnitStat speed;
@@ -19,12 +21,17 @@ public abstract class AbstractUnitController : MonoBehaviour
     protected UnitStat detection;
 
     //stat getters
+    public virtual float CurrentHealth { get { return health.CurrentHealthValue; }}
+    public virtual float MaxHealth { get { return health.MaxHealthValue; }}
     public virtual float Strength { get { return strength.Value; }}
     public virtual float Precision { get { return precision.Value; }}
     public virtual float Speed { get { return speed.Value; }}
     public virtual float Armor { get { return armor.Value; }}
     public virtual float Movement { get { return movement.Value; }}
     public virtual float Detection { get { return detection.Value; }}
+
+    //health slider
+    protected Slider healthSlider;
 
     //Actions
     protected bool action = true;
@@ -59,9 +66,10 @@ public abstract class AbstractUnitController : MonoBehaviour
         currentTile = tile;
     }
 
-    public void LoadPlayerData(PlayerUnitData data)
+    public void LoadUnitData(UnitData data)
     {
         unitName = data.Name;
+        health = new HealthSystem(data.Health);
         strength = new UnitStat(data.Strength);
         precision = new UnitStat(data.Precision);
         speed = new UnitStat(data.Speed);
@@ -76,6 +84,8 @@ public abstract class AbstractUnitController : MonoBehaviour
 
     private void Start() 
     {
+        //find health slider
+        healthSlider = this.gameObject.GetComponentInChildren<Slider>();
         //set up event listeners
         EventManager.current.onUnitMovement += Moved;
         EventManager.current.onUndoMovement += UndoMove;
@@ -90,6 +100,11 @@ public abstract class AbstractUnitController : MonoBehaviour
         EventManager.current.onUndoMovement -= UndoMove;
         EventManager.current.onUnitEndTurn -= EndTurn;
         EventManager.current.onUnitRefresh -= Refresh;
+    }
+
+    private void Update()
+    {
+        
     }
 
     private void OnMouseDown() 

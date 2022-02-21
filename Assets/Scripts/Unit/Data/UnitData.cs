@@ -12,6 +12,8 @@ public abstract class UnitData
 
     //Stats
     [SerializeField]
+    protected HealthSystem health;
+    [SerializeField]
     protected UnitStat strength;
     [SerializeField]
     protected UnitStat precision;
@@ -30,6 +32,7 @@ public abstract class UnitData
 
     //Stat Getters
     public virtual string Name { get { return name; } }
+    public virtual float Health { get { return health.MaxHealthValue; }}
     public virtual float Strength { get { return strength.Value; } }
     public virtual float Precision { get { return precision.Value; } }
     public virtual float Speed { get { return speed.Value; } }
@@ -40,6 +43,7 @@ public abstract class UnitData
     public UnitData(string name, float hp, float str, float prc, float spd, float arm, float mov, float detect, string sprite) 
     {
         this.name = name;
+        this.health = new HealthSystem(hp);
         this.strength = new UnitStat(str);
         this.precision = new UnitStat(prc);
         this.speed = new UnitStat(spd);

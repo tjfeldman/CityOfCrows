@@ -20,7 +20,7 @@ namespace Manager
             }
         }
 
-        void Awake()
+        void Start()
         {
             army = new List<GameObject>();
             if (UnitObj == null) {

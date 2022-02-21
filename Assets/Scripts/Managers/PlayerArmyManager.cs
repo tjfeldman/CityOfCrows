@@ -15,7 +15,7 @@ namespace Manager
             foreach (PlayerUnitData d in data.PlayerUnits) {
                 Debug.Log("Creating Player Character \"" + d.Name + "\"");
                 GameObject unit = Instantiate(UnitObj);
-                unit.GetComponentInChildren<PlayerUnitController>().LoadPlayerData(d);
+                unit.GetComponentInChildren<PlayerUnitController>().LoadUnitData(d);
 
                 army.Add(unit);
             }
