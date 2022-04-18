@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Actions;
 
-public class PlayerUnitController : AbstractUnitController
+public class EnemyUnitController : AbstractUnitController
 {
-    //TODO: Exp
-
-    //TODO: Player Only Actions?
+    //TODO: Enemy Only Actions?
     // public override List<UnitAction> GetActions()
     // {
         

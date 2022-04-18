@@ -118,7 +118,24 @@ public abstract class AbstractUnitController : MonoBehaviour
         return unitName + "(" + this.GetType()  + ")";
     }
 
-    public abstract List<UnitAction> GetActions();
+    public List<UnitAction> GetActions() 
+    {
+        List<UnitAction> actions = new List<UnitAction>();
+
+        if (CanAct()) 
+        {
+            if (HasMove()) {
+                actions.Add(new MoveAction(this));
+            } else if (Movement > 0) {
+                actions.Add(new UndoMoveAction(this, startTurnTile));
+            }
+
+            //wait is a default action. All units can wait
+            actions.Add(new WaitAction(this));
+        }
+        
+        return actions;
+    }
 
     private void Moved(AbstractUnitController unit, MoveTileController tile)
     {

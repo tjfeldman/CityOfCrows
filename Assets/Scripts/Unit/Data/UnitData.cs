@@ -4,7 +4,7 @@ using UnitStats;
 using UnityEngine;
 
 [System.Serializable]
-public abstract class UnitData
+public class UnitData
 {
     //Unit Name
     [SerializeField]

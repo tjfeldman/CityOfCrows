@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Manager
 {
-    public class PlayerArmyManager : AbstractArmyManager
+    public class EnemyArmyManager : AbstractArmyManager
     {
         protected override void LoadArmy()
         {
@@ -13,9 +13,9 @@ namespace Manager
             ArmyData data = JsonUtility.FromJson<ArmyData>(ArmyJSON.text);
 
             foreach (UnitData d in data.Units) {
-                Debug.Log("Creating Player Character \"" + d.Name + "\"");
+                Debug.Log("Creating Enemy Unit \"" + d.Name + "\"");
                 GameObject unit = Instantiate(UnitObj);
-                unit.GetComponentInChildren<PlayerUnitController>().LoadUnitData(d);
+                unit.GetComponentInChildren<EnemyUnitController>().LoadUnitData(d);
 
                 army.Add(unit);
             }

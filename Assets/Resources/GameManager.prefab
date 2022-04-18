@@ -32,6 +32,7 @@ Transform:
   - {fileID: 1153879423739092321}
   - {fileID: 2626097598357768977}
   - {fileID: 3331029221676770846}
+  - {fileID: 6979279795182443110}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -366,6 +367,51 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: X Turn
+--- !u!1 &7526853806529368524
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6979279795182443110}
+  - component: {fileID: 1574956110199865555}
+  m_Layer: 0
+  m_Name: EnemyArmyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6979279795182443110
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7526853806529368524}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6469576871353743053}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1574956110199865555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7526853806529368524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a2b9ee611d19b44bb996e33d3194e92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ArmyJSON: {fileID: 4900000, guid: cc6243e5470db9e4ea7258d5306c20db, type: 3}
+  UnitObj: {fileID: 8275718353893013697, guid: e80b2d37e7853e04ba1f09575b40d524, type: 3}
 --- !u!1 &7841753875601846659
 GameObject:
   m_ObjectHideFlags: 0

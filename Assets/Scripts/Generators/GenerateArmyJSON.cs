@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-public class GeneratePlayerArmyJSON : MonoBehaviour
+public class GenerateArmyJSON : MonoBehaviour
 {
+    public string path = "Assets/Resources/Data/Unit/army.json";
     // Start is called before the first frame update
     void Start()
     {
-        List<PlayerUnitData> playerArmy = new List<PlayerUnitData>();
+        List<UnitData> army = new List<UnitData>();
         foreach (CharacterBuilder unit in this.GetComponentsInChildren<CharacterBuilder>())
         {
-            playerArmy.Add(new PlayerUnitData(unit.UnitName, unit.HitPoints, unit.Strength, unit.Precision, unit.Speed, unit.Armor, unit.Movement, unit.Detection, unit.Texture.name));
+            army.Add(new UnitData(unit.UnitName, unit.HitPoints, unit.Strength, unit.Precision, unit.Speed, unit.Armor, unit.Movement, unit.Detection, unit.Texture.name));
         }
 
-        PlayerArmyData data = new PlayerArmyData(playerArmy);
+        ArmyData data = new ArmyData(army);
         string json = JsonUtility.ToJson(data);
-        string path = "Assets/Resources/Data/Unit/playerArmy.json";
 
         StreamWriter writer = new StreamWriter(path, false);
         writer.Write(json);

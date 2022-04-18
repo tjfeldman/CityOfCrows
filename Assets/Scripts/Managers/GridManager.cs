@@ -37,12 +37,16 @@ namespace Manager
         private LevelData levelData;
         private GameObject[,] gameGrid;
         private List<SpawnerData> playerSpawns;
+        private List<SpawnerData> enemySpawns;
+        private List<SpawnerData> allySpawns;
         private List<GameObject> movementTiles;
 
-        private void Awake()
+        private void Start()
         {
             //define these lists to prevent future errors
             playerSpawns = new List<SpawnerData>();
+            enemySpawns = new List<SpawnerData>();
+            allySpawns = new List<SpawnerData>();
             movementTiles = new List<GameObject>();
 
             if (LevelJSON != null) 
@@ -107,6 +111,8 @@ namespace Manager
             foreach (SpawnerData spawner in levelData.Spawners) {
                 if (spawner.Type == TeamType.Player) {
                     playerSpawns.Add(spawner);
+                } else if (spawner.Type == TeamType.Enemy) {
+                    enemySpawns.Add(spawner);
                 }
             }
         }
@@ -123,13 +129,37 @@ namespace Manager
                 SpawnerData spawner = playerSpawns[i];
                 int x = spawner.Position.x;
                 int y = spawner.Position.y;
+                GameObject tile = gameGrid[x,y];
 
-                // GameObject unit = Instantiate(PlayerUnit, new Vector3(x,y,UNIT_Z), Quaternion.identity); //set Z to 1 so it shows over tile
                 unit.transform.position = new Vector3(x,y,UNIT_Z);
                 unit.transform.parent = transform;
                 PlayerUnitController pc = unit.GetComponentInChildren<PlayerUnitController>();                
-                pc.SetStartingTile(gameGrid[x,y].GetComponentInChildren<AbstractTileController>());
+                pc.SetStartingTile(tile.GetComponentInChildren<TerrainTileController>());
+                tile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(pc);
                 unit.name = pc.ToString();
+            }
+        }
+
+        public void SpawnEnemyArmy(ReadOnlyCollection<GameObject> army)
+        {
+            //if army is larger than number of enemy spawns output warning
+            if (army.Count > enemySpawns.Count) {
+                Debug.LogWarning("Army is bigger than the number of spawns");
+            }
+
+            for (int i = 0; i < army.Count && i < playerSpawns.Count; i++) {
+                GameObject unit = army[i];
+                SpawnerData spawner = enemySpawns[i];
+                int x = spawner.Position.x;
+                int y = spawner.Position.y;
+                GameObject tile = gameGrid[x,y];
+
+                unit.transform.position = new Vector3(x,y,UNIT_Z);
+                unit.transform.parent = transform;
+                EnemyUnitController enemy = unit.GetComponentInChildren<EnemyUnitController>();                
+                enemy.SetStartingTile(tile.GetComponentInChildren<TerrainTileController>());
+                tile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(enemy);
+                unit.name = enemy.ToString();
             }
         }
 
@@ -160,8 +190,11 @@ namespace Manager
         private void MoveUnitToTile(AbstractUnitController unit, AbstractTileController tile)
         {
             Vector2Int tilePos = tile.GetPosition();
+            GameObject terrainTile = gameGrid[tilePos.x,tilePos.y];
+
             unit.gameObject.transform.parent.position = new Vector3(tilePos.x, tilePos.y);
-            unit.SetCurrentTile(gameGrid[tilePos.x,tilePos.y].GetComponentInChildren<AbstractTileController>());
+            unit.SetCurrentTile(terrainTile.GetComponentInChildren<AbstractTileController>());
+            terrainTile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(unit);
             CloseMovementOptionsForUnit(unit);
         }
 
@@ -174,14 +207,14 @@ namespace Manager
             List<GameObject> validMovementOptions = new List<GameObject>();
             for (int i = (int)Direction.UP; i <= (int)Direction.RIGHT; i++)
             {
-                checkValidMovementInDirection(validMovementOptions, (Direction)i, position, (Direction)i, movement);
+                checkValidMovementInDirection(unit.GetType(), validMovementOptions, (Direction)i, position, (Direction)i, movement);
             }
 
             return validMovementOptions;
         }
 
         //Recursive function that checks step by step in a single direction all possible movements in that direction from starting position
-        private void checkValidMovementInDirection(List<GameObject> validMovementOptions, Direction startingDirection, Vector2Int position, Direction currentDirection, int movementLeft)
+        private void checkValidMovementInDirection(Type unitType, List<GameObject> validMovementOptions, Direction startingDirection, Vector2Int position, Direction currentDirection, int movementLeft)
         {
             int x = position.x;
             int y = position.y;
@@ -206,32 +239,36 @@ namespace Manager
 
                 if (isValidTile(x, y)) {
                     GameObject tile = gameGrid[x, y];
-                    int movementCost = tile.GetComponentInChildren<TerrainTileController>().MovementCost;
-                    if (movementCost > 0) 
+                    AbstractUnitController unit = tile.GetComponentInChildren<TerrainTileController>().Unit;
+                    if (unit == null || unitType == unit.GetType()) //only allow movement through units of the same type
                     {
-                        movementLeft -= movementCost;
-                        //if unit has the movement to move on to the tile, then we can continue
-                        if (movementLeft >= 0) {
-                            //add tile to valid movement options if tile is not already in valid movement options
-                            if (!validMovementOptions.Contains(tile)) 
-                            {
-                                validMovementOptions.Add(tile);
-                            }
-                            //now continue to check the next tiles in the current direction
-                            checkValidMovementInDirection(validMovementOptions, startingDirection, new Vector2Int(x,y), currentDirection, movementLeft);
+                        int movementCost = tile.GetComponentInChildren<TerrainTileController>().MovementCost;
+                        if (movementCost > 0) 
+                        {
+                            movementLeft -= movementCost;
+                            //if unit has the movement to move on to the tile, then we can continue
+                            if (movementLeft >= 0) {
+                                //add tile to valid movement options if tile does not contain a unit and tile is not already in valid movement options
+                                if (unit == null && !validMovementOptions.Contains(tile)) 
+                                {
+                                    validMovementOptions.Add(tile);
+                                }
+                                //now continue to check the next tiles in the current direction
+                                checkValidMovementInDirection(unitType, validMovementOptions, startingDirection, new Vector2Int(x,y), currentDirection, movementLeft);
 
-                            //now check the directions to the side of the tile based on current direction as long as you don't go in the opposite direction
-                            //adjacent directions are +1 and +3 from current direction
-                            Direction adjacentDirection = currentDirection + 1;
-                            if (adjacentDirection > Direction.RIGHT) { adjacentDirection -= Direction.RIGHT; }
-                            if (isNotOppositeDirectionFromStarting(adjacentDirection, startingDirection)) {
-                                checkValidMovementInDirection(validMovementOptions, startingDirection, new Vector2Int(x,y), adjacentDirection, movementLeft);
-                            }
+                                //now check the directions to the side of the tile based on current direction as long as you don't go in the opposite direction
+                                //adjacent directions are +1 and +3 from current direction
+                                Direction adjacentDirection = currentDirection + 1;
+                                if (adjacentDirection > Direction.RIGHT) { adjacentDirection -= Direction.RIGHT; }
+                                if (isNotOppositeDirectionFromStarting(adjacentDirection, startingDirection)) {
+                                    checkValidMovementInDirection(unitType, validMovementOptions, startingDirection, new Vector2Int(x,y), adjacentDirection, movementLeft);
+                                }
 
-                            adjacentDirection = currentDirection + 3;
-                            if (adjacentDirection > Direction.RIGHT) { adjacentDirection -= Direction.RIGHT; }
-                            if (isNotOppositeDirectionFromStarting(adjacentDirection, startingDirection)) {
-                                checkValidMovementInDirection(validMovementOptions, startingDirection, new Vector2Int(x,y), adjacentDirection, movementLeft);
+                                adjacentDirection = currentDirection + 3;
+                                if (adjacentDirection > Direction.RIGHT) { adjacentDirection -= Direction.RIGHT; }
+                                if (isNotOppositeDirectionFromStarting(adjacentDirection, startingDirection)) {
+                                    checkValidMovementInDirection(unitType, validMovementOptions, startingDirection, new Vector2Int(x,y), adjacentDirection, movementLeft);
+                                }
                             }
                         }
                     }

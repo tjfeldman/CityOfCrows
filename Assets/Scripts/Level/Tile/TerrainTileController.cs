@@ -11,12 +11,15 @@ public class TerrainTileController : AbstractTileController
     private string tileName = "Tile";
     private int movementCost = 1;
     private int detectionPenalty = 0;
+    private AbstractUnitController unit = null;
+
 
     //getters
     public string TileName { get { return tileName; }}
     public int MovementCost { get { return movementCost; }}
     public int DetectionPenalty { get { return detectionPenalty; }}
-
+    public AbstractUnitController Unit { get { return unit; }}
+    
     public void LoadTileData(TileData data)
     {
         tileName = data.TileName;
@@ -31,6 +34,11 @@ public class TerrainTileController : AbstractTileController
             this.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(sizeX, sizeY);
             this.gameObject.transform.position += new Vector3(sizeX/2f - 0.5f, sizeY/2f - 0.5f, 0);
         }
+    }
+
+    public void SetUnitOnTile(AbstractUnitController unit)
+    {
+        this.unit = unit;
     }
 
     void OnMouseDown() 

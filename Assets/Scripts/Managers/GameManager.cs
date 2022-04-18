@@ -23,7 +23,7 @@ namespace Manager
         private GridManager gridManager;
         private DisplayManager displayManager;
         private PlayerArmyManager playerArmyManager;
-        //enemy manager
+        private EnemyArmyManager enemyArmyManager;
         private bool noAllies = true;//ally manager
 
         private TeamType currentTurn = TeamType.None;
@@ -69,11 +69,20 @@ namespace Manager
                 return;
             }
 
+            //set up enemy army manager
+            enemyArmyManager = this.GetComponentInChildren<EnemyArmyManager>();
+            if (enemyArmyManager == null) 
+            {
+                Debug.Log("Unable to Find Enemy Army Manager");
+                return;
+            }
+
             //set up grid manager
             gridManager = this.GetComponentInChildren<GridManager>();
             if (gridManager != null) 
             {
                 gridManager.SpawnPlayerArmy(playerArmyManager.Army);
+                gridManager.SpawnEnemyArmy(enemyArmyManager.Army);
             } else {
                 Debug.LogError("Unable To Find the Grid Manager");
                 return;
