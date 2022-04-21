@@ -189,12 +189,17 @@ namespace Manager
 
         private void MoveUnitToTile(AbstractUnitController unit, AbstractTileController tile)
         {
+            Vector2Int unitPos = unit.GetPosition();
             Vector2Int tilePos = tile.GetPosition();
-            GameObject terrainTile = gameGrid[tilePos.x,tilePos.y];
+
+            GameObject oldTerrainTile = gameGrid[unitPos.x,unitPos.y];
+            GameObject newTerrainTile = gameGrid[tilePos.x,tilePos.y];
+            
 
             unit.gameObject.transform.parent.position = new Vector3(tilePos.x, tilePos.y);
-            unit.SetCurrentTile(terrainTile.GetComponentInChildren<AbstractTileController>());
-            terrainTile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(unit);
+            unit.SetCurrentTile(newTerrainTile.GetComponentInChildren<AbstractTileController>());
+            oldTerrainTile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(null);//remove unit being on old tile
+            newTerrainTile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(unit);//add unit being on new tile
             CloseMovementOptionsForUnit(unit);
         }
 
