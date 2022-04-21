@@ -9,7 +9,7 @@ namespace Weapons {
         public override float Range => 1.0f;
         public override float Accuracy => 100.0f;
 
-        public override float calculateAttackPower(AbstractUnitController user) {
+        public override float CalculateAttackPower(AbstractUnitController user) {
 
             float attackPower = Attack;
             if (user != null) {

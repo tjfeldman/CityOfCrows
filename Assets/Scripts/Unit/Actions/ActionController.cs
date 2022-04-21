@@ -1,19 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 namespace Actions 
 {
     public class ActionController : MonoBehaviour
     {
-        private UnitAction action;
+        private IAction action;
 
-        public void SetAction(UnitAction action)
+        public void SetAction(IAction action)
         {
             this.action = action;
-            //set texture
-            Texture2D tex = action.GetTexture();
-            this.gameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            this.gameObject.GetComponentInChildren<TextMeshPro>().text = action.Name;
         }
 
         private void OnMouseDown() 

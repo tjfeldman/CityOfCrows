@@ -131,9 +131,17 @@ public abstract class AbstractUnitController : MonoBehaviour
         return unitName + "(" + this.GetType()  + ")";
     }
 
-    public List<UnitAction> GetActions() 
+    public List<IAction> GetActions() 
     {
-        List<UnitAction> actions = new List<UnitAction>();
+        List<IAction> actions = new List<IAction>();
+
+        List<IAction> inventoryActions = inventory.GetActions();
+
+        //TODO: Sort Actions so they appear in specfic order?
+        if (inventoryActions.Count > 0) 
+        {
+            actions.AddRange(inventoryActions);
+        }
 
         if (CanAct()) 
         {

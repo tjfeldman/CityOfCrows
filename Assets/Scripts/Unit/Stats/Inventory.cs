@@ -39,9 +39,25 @@ public class Inventory
         this.weapon = Weapon.GetType().ToString();
     }
 
-    public List<UnitAction> GetActions()
+    public List<IAction> GetActions()
     {
-        return new List<UnitAction>();
+        List<IAction> inventoryActions = new List<IAction>();
+        if (Weapon != null) {
+            AttackAction attackAction = new AttackAction(Owner);//create attack action for the inventory owner
+            List<IAction> weaponActions = Weapon.GetActions();
+            foreach (IAction weaponAction in weaponActions) 
+            {
+                if (weaponAction.GetType() == typeof(WeaponAction)) {
+                    attackAction.AddAttack((WeaponAction)weaponAction);
+                }
+            }
+
+            if (attackAction.HasAttacks()) {
+                inventoryActions.Add(attackAction);
+            }
+        }
+
+        return inventoryActions;
     }
 
     public override string ToString()

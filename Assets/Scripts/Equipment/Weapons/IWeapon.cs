@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Actions;
 
 namespace Weapons {
 
@@ -54,6 +55,9 @@ namespace Weapons {
         }
 
         //Calculates the weapon's attack power with the user
-        float calculateAttackPower(AbstractUnitController user);
+        float CalculateAttackPower(AbstractUnitController user);
+
+        //return list of actions you can do with weapon
+        List<IAction> GetActions();
     }
 }

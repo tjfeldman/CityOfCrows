@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Actions;
 
 namespace Weapons {
 
@@ -13,7 +14,12 @@ namespace Weapons {
         public abstract float Range {get;}
         public abstract float Accuracy {get;}
 
-        public abstract float calculateAttackPower(AbstractUnitController user);
+        public abstract float CalculateAttackPower(AbstractUnitController user);
+
+        public List<IAction> GetActions() 
+        {
+            return new List<IAction>() { new WeaponAction(this) };//by default all weapons have a weapon action AKA an attack
+        }
 
     }
 }

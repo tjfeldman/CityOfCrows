@@ -192,7 +192,7 @@ namespace Manager
                     activeUnit = unit;//This unit is now the active unit
 
                     Vector2Int position = unit.GetPosition();
-                    List<UnitAction> actions = unit.GetActions();
+                    List<IAction> actions = unit.GetActions();
                     bool even = actions.Count % 2 == 0;
                     //TODO: Buttons could appear off screen depending on where the player is. Should handle that.
                     float offset =  even ? 0.75f : 0.0f;//For even numbers we want to add a 0.75 offset from the center. For odd numbers we can place the odd button in the center
