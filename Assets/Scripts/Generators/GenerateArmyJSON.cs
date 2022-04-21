@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using Weapons;
 
 public class GenerateArmyJSON : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class GenerateArmyJSON : MonoBehaviour
         {
             army.Add(new UnitData(unit.UnitName, unit.HitPoints, unit.Strength, unit.Precision, unit.Speed, unit.Armor, unit.Movement, unit.Detection, unit.Texture.name));
         }
+
+        army[0].inventory.EquipWeapon(new Knife());
 
         ArmyData data = new ArmyData(army);
         string json = JsonUtility.ToJson(data);

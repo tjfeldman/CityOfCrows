@@ -18,8 +18,13 @@ namespace Weapons {
             get;
         }
 
+        string Name
+        {
+            get;
+        }
+
         //Damage is the dealt by the weapon
-        float Damage
+        float Attack
         {
             get;
         }
@@ -48,10 +53,7 @@ namespace Weapons {
             get;
         }
 
-        //Attempts to equip weapon to unit and returns True if successful or False if failed
-        bool EquipTo(AbstractUnitController unit);
-
-        //attempts to unequip weapon from unit and returns True if successful or False if failed
-        bool UnequipFrom(AbstractUnitController unit);
+        //Calculates the weapon's attack power with the user
+        float calculateAttackPower(AbstractUnitController user);
     }
 }

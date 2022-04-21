@@ -14,6 +14,8 @@ public class CharacterBuilder : MonoBehaviour
     public float Detection;
     public Texture2D Texture;
 
+    //TODO: Figure out how to define inventory equipment here
+
     public override string ToString()
     {
         return "Name: " + UnitName + " Texture: " + Texture.ToString();

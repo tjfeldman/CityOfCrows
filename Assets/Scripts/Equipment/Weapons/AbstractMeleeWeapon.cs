@@ -4,19 +4,19 @@ using System.Collections.Generic;
 namespace Weapons {
 
     public abstract class AbstractMeleeWeapon : AbstractWeapon
-    {
-        //constants
-        public const float ACCURACY = 100.0f;//Melee Weapons always hit
-        
-        public AbstractMeleeWeapon(string name, float baseDamage, float armorPen, float speedModifier, float range, UnitTypeRestriction restriction) : base(name, baseDamage, armorPen, speedModifier, ACCURACY, range, restriction) {}
+    {        
+        public override UnitTypeRestriction UnitRestriction => UnitTypeRestriction.ALL;
+        public override float Range => 1.0f;
+        public override float Accuracy => 100.0f;
 
-        protected override float calculateDamage() {
-            float damage = baseDamage;
-            if (owner != null) {
-                damage += owner.Strength;
+        public override float calculateAttackPower(AbstractUnitController user) {
+
+            float attackPower = Attack;
+            if (user != null) {
+                attackPower += user.Strength;
             }
 
-            return damage;
+            return attackPower;
         }
         
     }

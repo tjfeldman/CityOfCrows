@@ -27,6 +27,9 @@ public class UnitData
     protected UnitStat detection;
 
     [SerializeField]
+    public Inventory inventory;
+
+    [SerializeField]
     protected string sprite;
     public virtual string Sprite { get { return sprite; }}
 
@@ -51,6 +54,7 @@ public class UnitData
         this.movement = new UnitStat(mov);
         this.detection = new UnitStat(detect);
         this.sprite = sprite;
+        this.inventory = new Inventory(null);
     }   
 
 }

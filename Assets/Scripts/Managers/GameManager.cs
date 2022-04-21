@@ -184,6 +184,7 @@ namespace Manager
             {
                 ResetActiveUnit();
                 displayManager.DisplayStatForUnit(unit);
+                Debug.Log(unit.DisplayInventoryContents()); //TODO: Display Equipment in HUD
 
                 //if unit clicked is a player, we need to display the actions the player can do for that unit
                 if (typeof(PlayerUnitController).IsInstanceOfType(unit))

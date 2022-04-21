@@ -33,6 +33,9 @@ public abstract class AbstractUnitController : MonoBehaviour
     //health slider
     protected Slider healthSlider;
 
+    //inventory
+    protected Inventory inventory;
+
     //Actions
     protected bool action = true;
     protected bool move = true;
@@ -76,6 +79,7 @@ public abstract class AbstractUnitController : MonoBehaviour
         armor = new UnitStat(data.Armor);
         movement = new UnitStat(data.Movement);
         detection = new UnitStat(data.Detection);
+        inventory = new Inventory(this, data.inventory);
 
         this.gameObject.GetComponent<SpriteRenderer>().sprite = Utilities.GetSpriteByName(data.Sprite);
 
@@ -84,6 +88,10 @@ public abstract class AbstractUnitController : MonoBehaviour
 
     private void Start() 
     {
+        //create inventory if no inventory already exists
+        if (inventory == null) {
+            inventory = new Inventory(this);
+        }
         //find health slider
         healthSlider = this.gameObject.GetComponentInChildren<Slider>();
         //set up event listeners
@@ -111,6 +119,11 @@ public abstract class AbstractUnitController : MonoBehaviour
     {
         Debug.Log("You have clicked on Unit: " + ToString());
         EventManager.current.UnitClicked(this);
+    }
+
+    public string DisplayInventoryContents()
+    {
+        return inventory.ToString();
     }
 
     public override string ToString() 
