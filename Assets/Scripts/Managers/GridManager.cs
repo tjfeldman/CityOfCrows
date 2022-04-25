@@ -11,7 +11,7 @@ namespace Manager
     {
         //Z values for tiles and units
         private const float GRID_TILE_Z = 1.0f;
-        private const float MOVE_TILE_Z = 0.5f;
+        private const float DISPLAY_TILE_Z = 0.5f;
         private const float UNIT_Z = 0.0f;
 
         private enum Direction
@@ -32,6 +32,8 @@ namespace Manager
         [SerializeField]
         private GameObject MoveTile;
         [SerializeField]
+        private GameObject AttackTile;
+        [SerializeField]
         private GameObject PlayerUnit;
        
         private LevelData levelData;
@@ -39,6 +41,7 @@ namespace Manager
         private List<SpawnerData> playerSpawns;
         private List<SpawnerData> enemySpawns;
         private List<SpawnerData> allySpawns;
+        private List<GameObject> attackTiles;
         private List<GameObject> movementTiles;
 
         private void Start()
@@ -47,6 +50,7 @@ namespace Manager
             playerSpawns = new List<SpawnerData>();
             enemySpawns = new List<SpawnerData>();
             allySpawns = new List<SpawnerData>();
+            attackTiles = new List<GameObject>();
             movementTiles = new List<GameObject>();
 
             if (LevelJSON != null) 
@@ -163,6 +167,51 @@ namespace Manager
             }
         }
 
+        /*
+        * Attack Handling
+        */
+
+        public void ShowAttackRangeForPlayerUnitWithWeapon(PlayerUnitController unit, Weapons.IWeapon weapon)
+        {
+            GetAttackRangeForWeaponFromPosition(weapon, unit.GetPosition());
+            foreach (GameObject attackTile in attackTiles)
+            {
+                attackTile.GetComponentInChildren<AttackTileController>().Unit = unit;
+            }
+        }
+
+        //Checks for all possible movement options for unit
+        private void GetAttackRangeForWeaponFromPosition(Weapons.IWeapon weapon, Vector2Int position)
+        {
+            int range = (int)weapon.Range;
+            //TODO: Weapon Requirements such as LoS
+
+            for (int x = -(int)range; x <= range; x++) 
+            {
+                for (int y = -(int)range; y <= range; y++) 
+                {
+                    if (x == 0 && y == 0) {
+                        continue;//skip since unit can't attack itself
+                    }
+
+                    if (Math.Abs(x) + Math.Abs(y) > range) {
+                        continue;//skip since unit can't attack pass their max range
+                    }
+
+                    Vector2Int tilePos = new Vector2Int(position.x + x, position.y + y);
+                    GameObject attackTile = Instantiate(AttackTile, new Vector3(tilePos.x, tilePos.y, DISPLAY_TILE_Z), Quaternion.identity);
+                    attackTile.GetComponentInChildren<AttackTileController>().SetPosition(tilePos.x, tilePos.y);
+                    attackTile.transform.parent = transform;
+                    attackTile.gameObject.name = "Attack Tile (X: " + tilePos.x.ToString() + ", Y: " + tilePos.y.ToString() + ")";
+                    attackTiles.Add(attackTile);
+                }
+            }
+        }
+
+        /*
+        * Movement Handling
+        */
+
         public void ShowMovementOptionsForPlayerUnit(PlayerUnitController unit)
         {
             List<GameObject> validMovementOptions = GetMovementOptionsForUnit(unit);
@@ -170,7 +219,7 @@ namespace Manager
             foreach (GameObject tile in validMovementOptions) 
             {
                 Vector2Int tilePos = tile.GetComponentInChildren<TerrainTileController>().GetPosition();
-                GameObject movementTile = Instantiate(MoveTile, new Vector3(tilePos.x, tilePos.y, MOVE_TILE_Z), Quaternion.identity);
+                GameObject movementTile = Instantiate(MoveTile, new Vector3(tilePos.x, tilePos.y, DISPLAY_TILE_Z), Quaternion.identity);
                 movementTile.GetComponentInChildren<MoveTileController>().Unit = unit;
                 movementTile.GetComponentInChildren<MoveTileController>().SetPosition(tilePos.x, tilePos.y);
                 movementTile.transform.parent = transform;
@@ -293,6 +342,15 @@ namespace Manager
             Direction oppositeDirection = direction + 2; //opposite direction is +2 from direction
             if (oppositeDirection > Direction.RIGHT) { oppositeDirection -= Direction.RIGHT; }
             return startingDirection != oppositeDirection;
+        }
+
+        public void CloseAttackOptionsForUnit(AbstractUnitController unit)
+        {
+            foreach (GameObject attackTile in attackTiles)
+            {
+                Destroy(attackTile);
+            }
+            attackTiles.Clear();
         }
 
         public void CloseMovementOptionsForUnit(AbstractUnitController unit) 

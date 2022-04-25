@@ -28,6 +28,9 @@ namespace Manager
 
         private TeamType currentTurn = TeamType.None;
 
+        [SerializeField]
+        private GameObject ActionButtonPrefab;
+
         [System.Serializable]
         private class TeamColor {
             public TeamType Team;
@@ -91,6 +94,8 @@ namespace Manager
             //set up event listeners
             EventManager.current.onUnitClicked += OnUnitClicked;
             EventManager.current.onTileClicked += OnTileClicked;
+            EventManager.current.onAttackAction += AttackActionForUnit;
+            EventManager.current.onWeaponAttack += WeaponActionForUnit;
             EventManager.current.onMovementAction += MovementActionForUnit;
             EventManager.current.onUnitEndTurn += EndUnitTurn;
             EventManager.current.onTurnTransitionOver += SetTurnToTeam;
@@ -122,6 +127,8 @@ namespace Manager
             //remove event listeners on destroy
             EventManager.current.onUnitClicked -= OnUnitClicked;
             EventManager.current.onTileClicked -= OnTileClicked;
+            EventManager.current.onAttackAction -= AttackActionForUnit;
+            EventManager.current.onWeaponAttack -= WeaponActionForUnit;
             EventManager.current.onMovementAction -= MovementActionForUnit;
             EventManager.current.onUnitEndTurn -= EndUnitTurn;
             EventManager.current.onTurnTransitionOver -= SetTurnToTeam;
@@ -171,6 +178,7 @@ namespace Manager
             {
                 RemoveActionButtons();
                 displayManager.CloseDisplay();
+                gridManager.CloseAttackOptionsForUnit(activeUnit);
                 gridManager.CloseMovementOptionsForUnit(activeUnit);
                 activeUnit = null;
             }
@@ -200,9 +208,9 @@ namespace Manager
                     float top = (offset + ((above - 1) * 1.5f)) + position.y;//The top position is the offset + 1.5f for each button besides the first one plus the y position
                     for (int x = 0; x < actions.Count; x++)
                     {
-                        GameObject buttonPrefab = Resources.Load("Buttons/ActionButton") as GameObject;
+                        // GameObject buttonPrefab = Resources.Load("Buttons/ActionButton") as GameObject;
                         //we place the buttons starting from the top and going down 1.5f for each one after
-                        GameObject button = Instantiate(buttonPrefab, new Vector3(position.x + 1.5f, top - (x * 1.5f), -1), Quaternion.identity);
+                        GameObject button = Instantiate(ActionButtonPrefab, new Vector3(position.x + 1.5f, top - (x * 1.5f), -1), Quaternion.identity);
                         button.gameObject.GetComponentInChildren<ActionController>().SetAction(actions[x]);
                         actionButtons.Add(button);
                     }
@@ -217,6 +225,37 @@ namespace Manager
                 ResetActiveUnit();
                 Debug.Log("Tile: " + tile);
                 //to do show tile display
+            }
+        }
+
+        private void AttackActionForUnit(AbstractUnitController unit, List<WeaponAction> actions)
+        {
+            Debug.Log("Attack action for unit: " + unit);
+            if (typeof(PlayerUnitController).IsInstanceOfType(unit) && unit == activeUnit)
+            {
+                //if unit is player, show attack options as a new submenu.
+                Vector2Int position = unit.GetPosition();
+                bool even = actions.Count % 2 == 0;
+                float offset =  even ? 0.75f : 0.0f;//For even numbers we want to add a 0.75 offset from the center. For odd numbers we can place the odd button in the center
+                int above = (int)Math.Ceiling(actions.Count / 2.0f);//the number of buttons above the unit's y position should be half of them (rounded up)
+                float top = (offset + ((above - 1) * 1.5f)) + position.y;//The top position is the offset + 1.5f for each button besides the first one plus the y position
+
+                for (int x = 0; x < actions.Count; x++)
+                {
+                    GameObject button = Instantiate(ActionButtonPrefab, new Vector3(position.x + 4.5f, top - (x * 1.5f), -1), Quaternion.identity);
+                    button.gameObject.GetComponentInChildren<ActionController>().SetAction(actions[x]);
+                    actionButtons.Add(button);
+                }
+            }
+        }
+
+        private void WeaponActionForUnit(AbstractUnitController unit, Weapons.IWeapon weapon) 
+        {
+            Debug.Log("Doing Weapon Action for unit: " + unit + " with weapon: " + weapon);
+            if (typeof(PlayerUnitController).IsInstanceOfType(unit) && unit == activeUnit)
+            {
+                RemoveActionButtons();
+                gridManager.ShowAttackRangeForPlayerUnitWithWeapon((PlayerUnitController)unit, weapon);
             }
         }
 

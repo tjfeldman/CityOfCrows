@@ -30,7 +30,7 @@ namespace Actions {
         public override void DoAction()
         {
             Debug.Log("Attack Action for " + Unit.ToString());
-            // EventManager.current.MovementActionForUnit(Unit);
+            EventManager.current.AttackActionForUnit(Unit, attacks);
         }
     }
 }

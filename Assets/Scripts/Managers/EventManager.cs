@@ -12,6 +12,11 @@ public class EventManager : MonoBehaviour
         current = this;
     }
 
+    /*
+    * Display Information Events
+    */
+
+    //Event when a unit is clicked
     public event Action<AbstractUnitController> onUnitClicked;
     public void UnitClicked(AbstractUnitController unit)
     {
@@ -21,6 +26,7 @@ public class EventManager : MonoBehaviour
         }
     }
 
+    //Event when a tile is clicked
     public event Action<AbstractTileController> onTileClicked;
     public void TileClicked(AbstractTileController tile)
     {
@@ -30,6 +36,31 @@ public class EventManager : MonoBehaviour
         }
     }
 
+    /*
+    * Unit Action Events
+    */
+
+    //Event to display attack options when attack action is selected
+    public event Action<AbstractUnitController, List<Actions.WeaponAction>> onAttackAction;
+    public void AttackActionForUnit(AbstractUnitController unit, List<Actions.WeaponAction> actions)
+    {
+        if (onAttackAction != null)
+        {
+            onAttackAction(unit, actions);
+        }
+    }
+
+    //Event to engage in weapon attack
+    public event Action<AbstractUnitController, Weapons.IWeapon> onWeaponAttack;
+    public void WeaponAttackActionForUnitWeapon(AbstractUnitController unit, Weapons.IWeapon weapon)
+    {
+        if (onWeaponAttack != null)
+        {
+            onWeaponAttack(unit, weapon);
+        }
+    } 
+
+    //Event to display movement options when movement action is selected
     public event Action<AbstractUnitController> onMovementAction;
     public void MovementActionForUnit(AbstractUnitController unit) 
     {
@@ -40,6 +71,7 @@ public class EventManager : MonoBehaviour
 
     }
 
+    //Event to move unit to a location
     public event Action<AbstractUnitController, MoveTileController> onUnitMovement;
     public void MoveUnitToTile(AbstractUnitController unit, MoveTileController tile) 
     {
@@ -49,6 +81,7 @@ public class EventManager : MonoBehaviour
         }
     }
 
+    //Event to undo a movement action
     public event Action<AbstractUnitController, AbstractTileController> onUndoMovement;
     public void UndoMovement(AbstractUnitController unit, AbstractTileController tile)
     {
@@ -58,6 +91,7 @@ public class EventManager : MonoBehaviour
         }
     }
 
+    //Event when a unit ends their turn
     public event Action<AbstractUnitController> onUnitEndTurn;
     public void UnitEndTurn(AbstractUnitController unit)
     {
@@ -67,6 +101,7 @@ public class EventManager : MonoBehaviour
         }
     }
 
+    //Event to refresh a unit's actions
     public event Action<AbstractUnitController> onUnitRefresh;
     public void RefreshUnit(AbstractUnitController unit)
     {
@@ -76,6 +111,11 @@ public class EventManager : MonoBehaviour
         }
     }
 
+    /*
+    * Events for moving on to the next team's turn
+    */
+
+    //Event for initiating transition to the next team's turn
     public event Action<TeamType> onTurnTransitionOver;
     public void TurnTransitionOver(TeamType team)
     {
@@ -85,6 +125,7 @@ public class EventManager : MonoBehaviour
         }
     }
 
+    //Event to refresh an entire army
     public event Action<Manager.AbstractArmyManager> onRefreshArmy;
     public void RefreshArmy(Manager.AbstractArmyManager armyManager)
     {

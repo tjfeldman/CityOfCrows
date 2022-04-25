@@ -265,6 +265,10 @@ PrefabInstance:
       propertyPath: LevelJSON
       value: 
       objectReference: {fileID: 4900000, guid: 6725acb772e80264cbbb7096f43f043b, type: 3}
+    - target: {fileID: 3774746642973254646, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: ActionButtonPrefab
+      value: 
+      objectReference: {fileID: 6973094686087108914, guid: 7b6e4a2359cbc8a4b8428dca646b2782, type: 3}
     - target: {fileID: 4956940999809155436, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
       propertyPath: Unit
       value: 
@@ -273,6 +277,10 @@ PrefabInstance:
       propertyPath: LevelJSON
       value: 
       objectReference: {fileID: 4900000, guid: 6725acb772e80264cbbb7096f43f043b, type: 3}
+    - target: {fileID: 4956940999809155436, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
+      propertyPath: AttackTile
+      value: 
+      objectReference: {fileID: 3819817804794436225, guid: e4f0bb1f4403b36439da26eca7c9171e, type: 3}
     - target: {fileID: 4956940999809155436, guid: 7be84bc05c7131c4d80486dfec7668e9, type: 3}
       propertyPath: PlayerUnit
       value: 

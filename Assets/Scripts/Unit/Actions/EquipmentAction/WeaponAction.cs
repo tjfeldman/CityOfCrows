@@ -25,8 +25,7 @@ namespace Actions {
 
         public void DoAction()
         {
-            float attack = weapon.CalculateAttackPower(unit);
-            //do damage calculations
+            EventManager.current.WeaponAttackActionForUnitWeapon(unit, weapon);
         }
     }
 }
