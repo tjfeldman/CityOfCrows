@@ -43,6 +43,7 @@ namespace Manager
         
         private AbstractUnitController activeUnit = null; 
         private bool attackActionActive = false; //prevent spawning multiple weapon buttons
+        private bool attackRangeActive = false;
 
         // Start is called before the first frame update
         void Start()
@@ -87,6 +88,8 @@ namespace Manager
             }
 
             //set up event listeners
+            EventManager.current.onUnitHover += DisplayInformationForUnit;
+            EventManager.current.onUnitExit += HideDisplayInformationForUnit;
             EventManager.current.onUnitClicked += OnUnitClicked;
             EventManager.current.onTileClicked += OnTileClicked;
             EventManager.current.onAttackAction += AttackActionForUnit;
@@ -120,6 +123,8 @@ namespace Manager
         private void OnDestroy() 
         {
             //remove event listeners on destroy
+            EventManager.current.onUnitHover -= DisplayInformationForUnit;
+            EventManager.current.onUnitExit -= HideDisplayInformationForUnit;
             EventManager.current.onUnitClicked -= OnUnitClicked;
             EventManager.current.onTileClicked -= OnTileClicked;
             EventManager.current.onAttackAction -= AttackActionForUnit;
@@ -175,23 +180,51 @@ namespace Manager
                 displayManager.RemoveActionButtons();
                 displayManager.CloseDisplay();
                 gridManager.CloseAttackOptionsForUnit(activeUnit);
-                gridManager.CloseMovementOptionsForUnit(activeUnit);
+                attackRangeActive = false;
+                gridManager.CloseMovementForUnit(activeUnit);
                 activeUnit = null;
             }
         }
 
         //Event Handling
+        private void DisplayInformationForUnit(AbstractUnitController unit)
+        {
+            //When the unit is not the active unit, display the threat range, prevents rewritting the threat range. TODO: Change how this is handled
+            if (unit != activeUnit) {
+                displayManager.DisplayStatForUnit(unit);
+                gridManager.ShowMovementForUnit(unit);
+            }
+        }
+
+        private void HideDisplayInformationForUnit(AbstractUnitController unit)
+        {
+            //When the unit is not the active unit, remove the stat display and threat range
+            if (unit != activeUnit) 
+            {
+                gridManager.CloseMovementForUnit(unit);
+                //if there is an active unit, then display the active unit stats
+                if (activeUnit) {
+                    displayManager.DisplayStatForUnit(activeUnit);
+                } else {
+                    displayManager.CloseDisplay();
+                }
+            }
+        }
+
         private void OnUnitClicked(AbstractUnitController unit)
         {
             //Only do things when a unit is clicked on player's turn
             if (currentTurn == TeamType.Player) 
             {
-                ResetActiveUnit();
-                displayManager.DisplayStatForUnit(unit);
-                Debug.Log(unit.DisplayInventoryContents()); //TODO: Display Equipment in HUD
+                if (activeUnit != unit) {
+                    ResetActiveUnit();
+                }
+                // displayManager.DisplayStatForUnit(unit);
+                // Debug.Log(unit.DisplayInventoryContents()); //TODO: Display Equipment in HUD
 
                 //if unit clicked is a player, we need to display the actions the player can do for that unit
-                if (typeof(PlayerUnitController).IsInstanceOfType(unit))
+                //Unit can only become active unit if it can act
+                if (typeof(PlayerUnitController).IsInstanceOfType(unit) && unit.CanAct())
                 {
                     activeUnit = unit;//This unit is now the active unit
                     displayManager.DisplayActionsAt(unit.GetActions(), unit.GetPosition());
@@ -223,10 +256,12 @@ namespace Manager
         private void WeaponActionForUnit(AbstractUnitController unit, Weapons.IWeapon weapon) 
         {
             Debug.Log("Doing Weapon Action for unit: " + unit + " with weapon: " + weapon);
+            gridManager.CloseMovementForUnit(unit);
             if (typeof(PlayerUnitController).IsInstanceOfType(unit) && unit == activeUnit)
             {
                 displayManager.RemoveActionButtons();
-                gridManager.ShowAttackRangeForPlayerUnitWithWeapon((PlayerUnitController)unit, weapon);
+                gridManager.ShowAttackRangeForUnitWithWeapon(unit, weapon);
+                attackRangeActive = true;
             }
         }
 
@@ -237,7 +272,7 @@ namespace Manager
             if (typeof(PlayerUnitController).IsInstanceOfType(unit) && unit == activeUnit)
             {
                 displayManager.RemoveActionButtons();
-                gridManager.ShowMovementOptionsForPlayerUnit((PlayerUnitController)unit);
+                gridManager.AllowMovementForUnit(unit);
             }
             //TO DO Enemy and Ally movement
         }

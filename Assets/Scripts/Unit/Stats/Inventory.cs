@@ -39,6 +39,11 @@ public class Inventory
         this.weapon = Weapon.GetType().ToString();
     }
 
+    public List<IWeapon> GetWeapons()
+    {
+        return new List<IWeapon>(){this.Weapon};
+    }
+
     public List<IAction> GetActions()
     {
         List<IAction> inventoryActions = new List<IAction>();

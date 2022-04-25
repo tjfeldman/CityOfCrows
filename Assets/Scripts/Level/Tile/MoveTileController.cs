@@ -7,8 +7,18 @@ public class MoveTileController : AbstractTileController
 {
     public AbstractUnitController Unit;
 
+    private bool active = false;
+
+    public void AllowMovement()
+    {
+        active = true;
+    }
+
     void OnMouseDown() 
     {
-        EventManager.current.MoveUnitToTile(Unit, this);
+        //only allow event to trigger if the move tile controller is active
+        if (active) {
+            EventManager.current.MoveUnitToTile(Unit, this);
+        }
     }
 }

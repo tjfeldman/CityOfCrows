@@ -42,7 +42,14 @@ namespace Manager
         private List<SpawnerData> enemySpawns;
         private List<SpawnerData> allySpawns;
         private List<GameObject> attackTiles;
-        private List<GameObject> movementTiles;
+        // private List<GameObject> movementTiles;
+
+        //Dictionaries to hold available movement information for a unit
+        private Dictionary<AbstractUnitController, List<GameObject>> storedMovementOptions;//store calculated movement options that is cleared when any unit moves
+        private Dictionary<AbstractUnitController, List<GameObject>> storedMovementTiles;//stores movement tiles for unit
+
+        //Dictionaries to hold available attack information for a unit
+        private Dictionary<AbstractUnitController, List<GameObject>> storedAttackOptions;//store calculated attack options that is cleared when any unit moves
 
         private void Start()
         {
@@ -51,7 +58,12 @@ namespace Manager
             enemySpawns = new List<SpawnerData>();
             allySpawns = new List<SpawnerData>();
             attackTiles = new List<GameObject>();
-            movementTiles = new List<GameObject>();
+            // movementTiles = new List<GameObject>();
+
+            storedMovementOptions = new Dictionary<AbstractUnitController, List<GameObject>>();
+            storedMovementTiles = new Dictionary<AbstractUnitController, List<GameObject>>();
+
+            storedAttackOptions = new Dictionary<AbstractUnitController, List<GameObject>>();
 
             if (LevelJSON != null) 
             {
@@ -167,21 +179,92 @@ namespace Manager
             }
         }
 
+
+        //TODO: Update with Tile System Update
+        // public void ShowThreatRangeForUnit(AbstractUnitController unit)
+        // {
+        //     //if unit is player, then show where it can move and the attack range outside of their max movement
+        //     if (typeof(PlayerUnitController).IsInstanceOfType(unit))
+        //     {
+        //         //First show movement for unit
+        //         ShowMovementForUnit(unit);
+        //         //Now show attack options that extend outside of movement tiles
+        //         ShowAttackRangeOutsideUnitsMovement(unit);                
+        //     }
+            
+        // }
+
         /*
         * Attack Handling
         */
-
-        public void ShowAttackRangeForPlayerUnitWithWeapon(PlayerUnitController unit, Weapons.IWeapon weapon)
+        public void ShowAttackRangeForUnitWithWeapon(AbstractUnitController unit, Weapons.IWeapon weapon)
         {
-            GetAttackRangeForWeaponFromPosition(weapon, unit.GetPosition());
-            foreach (GameObject attackTile in attackTiles)
+            List<GameObject> validAttackOptions = new List<GameObject>();
+            GetAttackRangeForWeaponFromPosition(validAttackOptions, weapon, unit.GetPosition());
+            foreach (GameObject tile in validAttackOptions)
             {
+                Vector2Int tilePos = tile.GetComponentInChildren<TerrainTileController>().GetPosition();
+                GameObject attackTile = Instantiate(AttackTile, new Vector3(tilePos.x, tilePos.y, DISPLAY_TILE_Z), Quaternion.identity);
+                attackTile.GetComponentInChildren<AttackTileController>().SetPosition(tilePos.x, tilePos.y);
                 attackTile.GetComponentInChildren<AttackTileController>().Unit = unit;
+                attackTile.transform.parent = transform;
+                attackTile.gameObject.name = "Attack Tile (X: " + tilePos.x.ToString() + ", Y: " + tilePos.y.ToString() + ")";
+                attackTiles.Add(attackTile);
             }
         }
 
-        //Checks for all possible movement options for unit
-        private void GetAttackRangeForWeaponFromPosition(Weapons.IWeapon weapon, Vector2Int position)
+        // private void ShowAttackRangeOutsideUnitsMovement(AbstractUnitController unit) 
+        // {
+        //     List<GameObject> validMovementOptions = GetMovementOptionsForUnit(unit);
+        //     List<GameObject> validAttackOptions = GetAttackOptionsForUnit(unit);
+            
+        //     foreach (GameObject tile in validAttackOptions)
+        //     {
+        //         if (!validMovementOptions.Contains(tile))
+        //         {
+        //             Vector2Int tilePos = tile.GetComponentInChildren<TerrainTileController>().GetPosition();
+        //             GameObject attackTile = Instantiate(AttackTile, new Vector3(tilePos.x, tilePos.y, DISPLAY_TILE_Z), Quaternion.identity);
+        //             attackTile.GetComponentInChildren<AttackTileController>().SetPosition(tilePos.x, tilePos.y);
+        //             attackTile.GetComponentInChildren<AttackTileController>().Unit = unit;
+        //             attackTile.transform.parent = transform;
+        //             attackTile.gameObject.name = "Attack Tile (X: " + tilePos.x.ToString() + ", Y: " + tilePos.y.ToString() + ")";
+        //             attackTiles.Add(attackTile);
+        //         }
+        //     }
+        // }
+
+        //Checks for all possible attack options for unit
+        // private List<GameObject> GetAttackOptionsForUnit(AbstractUnitController unit)
+        // {
+        //     //If stored movement options does not have options for unit, calculate them
+        //     if (!storedAttackOptions.ContainsKey(unit)) {
+        //         List<GameObject> validMovementOptions = GetMovementOptionsForUnit(unit);
+        //         Vector2Int position = unit.GetPosition();
+
+        //         List<GameObject> validAttackOptions = new List<GameObject>();
+        //         //check each weapon's attack range
+        //         foreach (Weapons.IWeapon weapon in unit.GetWeapons())
+        //         {
+        //             //Get attack options from unit's location
+        //             GetAttackRangeForWeaponFromPosition(validAttackOptions, unit, weapon, position);
+
+        //             //Get attack options from unit's possible movement locations
+        //             foreach(GameObject tile in validMovementOptions)
+        //             {
+        //                 Vector2Int tilePos = tile.GetComponentInChildren<TerrainTileController>().GetPosition();
+        //                 GetAttackRangeForWeaponFromPosition(validAttackOptions, unit, weapon, tilePos);
+        //             }
+        //         }
+
+        //         storedAttackOptions.Add(unit, validAttackOptions);
+        //         Debug.Log("Stored Attack Options for Unit: " + unit);
+        //     }
+
+        //     return storedAttackOptions[unit];
+        // }
+
+        //Checks for all possible attack locations from position
+        private void GetAttackRangeForWeaponFromPosition(List<GameObject> validAttackOptions, Weapons.IWeapon weapon, Vector2Int position)
         {
             int range = (int)weapon.Range;
             //TODO: Weapon Requirements such as LoS
@@ -199,11 +282,10 @@ namespace Manager
                     }
 
                     Vector2Int tilePos = new Vector2Int(position.x + x, position.y + y);
-                    GameObject attackTile = Instantiate(AttackTile, new Vector3(tilePos.x, tilePos.y, DISPLAY_TILE_Z), Quaternion.identity);
-                    attackTile.GetComponentInChildren<AttackTileController>().SetPosition(tilePos.x, tilePos.y);
-                    attackTile.transform.parent = transform;
-                    attackTile.gameObject.name = "Attack Tile (X: " + tilePos.x.ToString() + ", Y: " + tilePos.y.ToString() + ")";
-                    attackTiles.Add(attackTile);
+                    if (isValidTile(tilePos)) {
+                        GameObject tile = gameGrid[tilePos.x, tilePos.y];
+                        validAttackOptions.Add(tile);
+                    }
                 }
             }
         }
@@ -212,10 +294,16 @@ namespace Manager
         * Movement Handling
         */
 
-        public void ShowMovementOptionsForPlayerUnit(PlayerUnitController unit)
+        public void ShowMovementForUnit(AbstractUnitController unit)
         {
+            if (!unit.HasMove()) 
+            {
+                return; //if unit can't move do not show valid movement options
+            }
             List<GameObject> validMovementOptions = GetMovementOptionsForUnit(unit);
+
             //draw valid movement options
+            List<GameObject> movementTiles = new List<GameObject>();
             foreach (GameObject tile in validMovementOptions) 
             {
                 Vector2Int tilePos = tile.GetComponentInChildren<TerrainTileController>().GetPosition();
@@ -226,18 +314,24 @@ namespace Manager
                 movementTile.gameObject.name = "Movement Tile (X: " + tilePos.x.ToString() + ", Y: " + tilePos.y.ToString() + ")";
                 movementTiles.Add(movementTile);
             }
+            storedMovementTiles.Add(unit, movementTiles);
         }
 
-        /*
-        FUTURE FUNCTION
-        public void GetMovementOptionsForEnemyUnit(EnemyUnitController unit)
+        public void AllowMovementForUnit(AbstractUnitController unit)
         {
-
+            if (storedMovementTiles.ContainsKey(unit))
+            {
+                List<GameObject> movementTiles = storedMovementTiles[unit];
+                foreach (GameObject movementTile in movementTiles)
+                {
+                    movementTile.GetComponentInChildren<MoveTileController>().AllowMovement();
+                }
+            }
         }
-        */
 
         private void MoveUnitToTile(AbstractUnitController unit, AbstractTileController tile)
         {
+            Debug.Log("Moving Unit: " + unit + " to Tile: " + tile);
             Vector2Int unitPos = unit.GetPosition();
             Vector2Int tilePos = tile.GetPosition();
 
@@ -249,22 +343,31 @@ namespace Manager
             unit.SetCurrentTile(newTerrainTile.GetComponentInChildren<AbstractTileController>());
             oldTerrainTile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(null);//remove unit being on old tile
             newTerrainTile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(unit);//add unit being on new tile
-            CloseMovementOptionsForUnit(unit);
+            CloseMovementForUnit(unit);
+
+            //clear stored movement option dictionary so movement options have to be recalculated since a unit has moved locations
+            storedMovementOptions.Clear();
         }
 
         //Checks for all possible movement options for unit
         private List<GameObject> GetMovementOptionsForUnit(AbstractUnitController unit)
         {
-            int movement = (int)unit.Movement;
-            Vector2Int position = unit.GetPosition();
+            //If stored movement options does not have options for unit, calculate them
+            if (!storedMovementOptions.ContainsKey(unit)) {
+                int movement = (int)unit.Movement;
+                Vector2Int position = unit.GetPosition();
 
-            List<GameObject> validMovementOptions = new List<GameObject>();
-            for (int i = (int)Direction.UP; i <= (int)Direction.RIGHT; i++)
-            {
-                checkValidMovementInDirection(unit.GetType(), validMovementOptions, (Direction)i, position, (Direction)i, movement);
+                List<GameObject> validMovementOptions = new List<GameObject>();
+                for (int i = (int)Direction.UP; i <= (int)Direction.RIGHT; i++)
+                {
+                    checkValidMovementInDirection(unit.GetType(), validMovementOptions, (Direction)i, position, (Direction)i, movement);
+                }
+
+                storedMovementOptions.Add(unit, validMovementOptions);
+                Debug.Log("Stored Movement Options for Unit: " + unit);
             }
 
-            return validMovementOptions;
+            return storedMovementOptions[unit];
         }
 
         //Recursive function that checks step by step in a single direction all possible movements in that direction from starting position
@@ -336,6 +439,11 @@ namespace Manager
             return (x >= 0 && x < levelData.Width) && (y >= 0 && y < levelData.Height);
         }
 
+        private bool isValidTile(Vector2Int pos)
+        {
+            return isValidTile(pos.x, pos.y);
+        }
+
         //return true if the direction is the opposite direction from starting direction
         private bool isNotOppositeDirectionFromStarting(Direction direction, Direction startingDirection)
         {
@@ -353,13 +461,19 @@ namespace Manager
             attackTiles.Clear();
         }
 
-        public void CloseMovementOptionsForUnit(AbstractUnitController unit) 
+        public void CloseMovementForUnit(AbstractUnitController unit) 
         {
-            foreach (GameObject movementTile in movementTiles) 
+            //if able to successfully unit's stored movement tiles then destroy each tile
+            if (storedMovementTiles.ContainsKey(unit))
             {
-                Destroy(movementTile);
+                Debug.Log("Removing Movement Tiles for Unit: " + unit);
+                List<GameObject> movementTiles = storedMovementTiles[unit];
+                foreach (GameObject movementTile in movementTiles) 
+                {
+                    Destroy(movementTile);
+                }
+                storedMovementTiles.Remove(unit);
             }
-            movementTiles.Clear();
         }
     }
 }

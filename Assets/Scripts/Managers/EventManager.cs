@@ -36,6 +36,24 @@ public class EventManager : MonoBehaviour
         }
     }
 
+    public event Action<AbstractUnitController> onUnitHover;
+    public void DisplayInformationForUnit(AbstractUnitController unit)
+    {
+        if (onUnitHover != null) 
+        {
+            onUnitHover(unit);
+        }
+    }
+
+    public event Action<AbstractUnitController> onUnitExit;
+    public void HideDisplayInformationForUnit(AbstractUnitController unit)
+    {
+        if (onUnitExit != null) 
+        {
+            onUnitExit(unit);
+        }
+    }
+
     /*
     * Unit Action Events
     */

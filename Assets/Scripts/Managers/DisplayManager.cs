@@ -56,6 +56,7 @@ namespace Manager
         }
 
         public void CloseDisplay() {
+            Debug.Log("Turning Display Off");
             StatDisplay.SetActive(false);
         }
 

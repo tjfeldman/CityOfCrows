@@ -121,6 +121,18 @@ public abstract class AbstractUnitController : MonoBehaviour
         EventManager.current.UnitClicked(this);
     }
 
+    private void OnMouseEnter()
+    {
+        Debug.Log("You are over Unit: " + ToString());
+        EventManager.current.DisplayInformationForUnit(this);
+    }
+
+    private void OnMouseExit()
+    {
+        Debug.Log("You are no longer over Unit: " + ToString());
+        EventManager.current.HideDisplayInformationForUnit(this);
+    }
+
     public string DisplayInventoryContents()
     {
         return inventory.ToString();
@@ -135,16 +147,16 @@ public abstract class AbstractUnitController : MonoBehaviour
     {
         List<IAction> actions = new List<IAction>();
 
-        List<IAction> inventoryActions = inventory.GetActions();
-
         //TODO: Sort Actions so they appear in specfic order?
-        if (inventoryActions.Count > 0) 
-        {
-            actions.AddRange(inventoryActions);
-        }
 
         if (CanAct()) 
         {
+            List<IAction> inventoryActions = inventory.GetActions();
+            if (inventoryActions.Count > 0) 
+            {
+                actions.AddRange(inventoryActions);
+            }
+
             if (HasMove()) {
                 actions.Add(new MoveAction(this));
             } else if (Movement > 0) {
@@ -156,6 +168,11 @@ public abstract class AbstractUnitController : MonoBehaviour
         }
         
         return actions;
+    }
+
+    public List<Weapons.IWeapon> GetWeapons()
+    {
+        return inventory.GetWeapons();
     }
 
     private void Moved(AbstractUnitController unit, MoveTileController tile)
