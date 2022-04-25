@@ -7,11 +7,11 @@ namespace Actions {
     {
         public override string Name => "Attack";
 
-        protected List<WeaponAction> attacks;
+        protected List<IAction> attacks;
 
         public AttackAction(AbstractUnitController unit) : base(unit)
         {
-            attacks = new List<WeaponAction>();
+            attacks = new List<IAction>();
         }
 
         //Adds a Weapon Action to the list of attacks
@@ -27,10 +27,16 @@ namespace Actions {
             return attacks.Count > 0;
         }
 
+        //TODO: Protect the list from being editted?
+        public List<IAction> GetWeaponActions()
+        {
+            return attacks;
+        }
+
         public override void DoAction()
         {
             Debug.Log("Attack Action for " + Unit.ToString());
-            EventManager.current.AttackActionForUnit(Unit, attacks);
+            EventManager.current.AttackActionForUnit(this, Unit);
         }
     }
 }

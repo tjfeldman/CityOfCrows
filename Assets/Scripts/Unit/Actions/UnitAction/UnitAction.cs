@@ -7,6 +7,19 @@ namespace Actions {
     {
         public abstract string Name {get;}
 
+        private Vector2 _pos;
+        public Vector2 Position 
+        {
+            get 
+            { 
+                return _pos;
+            }
+            set 
+            {
+                _pos = value;
+            }
+        }
+
         private AbstractUnitController unit;
         public virtual AbstractUnitController Unit { get { return unit; }}
 

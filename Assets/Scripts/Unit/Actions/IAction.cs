@@ -2,8 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IAction
-{
-    string Name { get; }
-    void DoAction();
+namespace Actions {
+    public interface IAction
+    {
+        string Name { get; }
+        Vector2 Position { get; set; }
+        void DoAction();
+    }
 }

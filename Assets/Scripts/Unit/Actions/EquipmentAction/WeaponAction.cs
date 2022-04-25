@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using Weapons;
 
 namespace Actions {
@@ -9,6 +10,19 @@ namespace Actions {
 
         private IWeapon weapon;
         private AbstractUnitController unit;
+
+        private Vector2 _pos;
+        public Vector2 Position 
+        {
+            get 
+            { 
+                return _pos;
+            }
+            set 
+            {
+                _pos = value;
+            }
+        }
 
         public virtual IWeapon Weapon { get { return weapon; }}
         public virtual AbstractUnitController Unit { get { return unit; }}

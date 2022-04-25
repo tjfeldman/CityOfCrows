@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
-using Actions;
 
 //outside namespace so anyone can access team type
 //might change later
@@ -28,9 +27,6 @@ namespace Manager
 
         private TeamType currentTurn = TeamType.None;
 
-        [SerializeField]
-        private GameObject ActionButtonPrefab;
-
         [System.Serializable]
         private class TeamColor {
             public TeamType Team;
@@ -46,8 +42,7 @@ namespace Manager
         private List<TeamColor> teamColors;
         
         private AbstractUnitController activeUnit = null; 
-        //List of Action Buttons being displayed
-        private List<GameObject> actionButtons = new List<GameObject>();
+        private bool attackActionActive = false; //prevent spawning multiple weapon buttons
 
         // Start is called before the first frame update
         void Start()
@@ -176,7 +171,8 @@ namespace Manager
         {
             if (activeUnit) 
             {
-                RemoveActionButtons();
+                attackActionActive = false;
+                displayManager.RemoveActionButtons();
                 displayManager.CloseDisplay();
                 gridManager.CloseAttackOptionsForUnit(activeUnit);
                 gridManager.CloseMovementOptionsForUnit(activeUnit);
@@ -198,22 +194,7 @@ namespace Manager
                 if (typeof(PlayerUnitController).IsInstanceOfType(unit))
                 {
                     activeUnit = unit;//This unit is now the active unit
-
-                    Vector2Int position = unit.GetPosition();
-                    List<IAction> actions = unit.GetActions();
-                    bool even = actions.Count % 2 == 0;
-                    //TODO: Buttons could appear off screen depending on where the player is. Should handle that.
-                    float offset =  even ? 0.75f : 0.0f;//For even numbers we want to add a 0.75 offset from the center. For odd numbers we can place the odd button in the center
-                    int above = (int)Math.Ceiling(actions.Count / 2.0f);//the number of buttons above the unit's y position should be half of them (rounded up)
-                    float top = (offset + ((above - 1) * 1.5f)) + position.y;//The top position is the offset + 1.5f for each button besides the first one plus the y position
-                    for (int x = 0; x < actions.Count; x++)
-                    {
-                        // GameObject buttonPrefab = Resources.Load("Buttons/ActionButton") as GameObject;
-                        //we place the buttons starting from the top and going down 1.5f for each one after
-                        GameObject button = Instantiate(ActionButtonPrefab, new Vector3(position.x + 1.5f, top - (x * 1.5f), -1), Quaternion.identity);
-                        button.gameObject.GetComponentInChildren<ActionController>().SetAction(actions[x]);
-                        actionButtons.Add(button);
-                    }
+                    displayManager.DisplayActionsAt(unit.GetActions(), unit.GetPosition());
                 }
             }
         }
@@ -228,24 +209,14 @@ namespace Manager
             }
         }
 
-        private void AttackActionForUnit(AbstractUnitController unit, List<WeaponAction> actions)
+        private void AttackActionForUnit(Actions.AttackAction action, AbstractUnitController unit)
         {
             Debug.Log("Attack action for unit: " + unit);
-            if (typeof(PlayerUnitController).IsInstanceOfType(unit) && unit == activeUnit)
+            if (!attackActionActive && typeof(PlayerUnitController).IsInstanceOfType(unit) && unit == activeUnit)
             {
                 //if unit is player, show attack options as a new submenu.
-                Vector2Int position = unit.GetPosition();
-                bool even = actions.Count % 2 == 0;
-                float offset =  even ? 0.75f : 0.0f;//For even numbers we want to add a 0.75 offset from the center. For odd numbers we can place the odd button in the center
-                int above = (int)Math.Ceiling(actions.Count / 2.0f);//the number of buttons above the unit's y position should be half of them (rounded up)
-                float top = (offset + ((above - 1) * 1.5f)) + position.y;//The top position is the offset + 1.5f for each button besides the first one plus the y position
-
-                for (int x = 0; x < actions.Count; x++)
-                {
-                    GameObject button = Instantiate(ActionButtonPrefab, new Vector3(position.x + 4.5f, top - (x * 1.5f), -1), Quaternion.identity);
-                    button.gameObject.GetComponentInChildren<ActionController>().SetAction(actions[x]);
-                    actionButtons.Add(button);
-                }
+                displayManager.DisplayActionsAt(action.GetWeaponActions(), new Vector2(action.Position.x + 1.0f, action.Position.y));
+                attackActionActive = true;
             }
         }
 
@@ -254,7 +225,7 @@ namespace Manager
             Debug.Log("Doing Weapon Action for unit: " + unit + " with weapon: " + weapon);
             if (typeof(PlayerUnitController).IsInstanceOfType(unit) && unit == activeUnit)
             {
-                RemoveActionButtons();
+                displayManager.RemoveActionButtons();
                 gridManager.ShowAttackRangeForPlayerUnitWithWeapon((PlayerUnitController)unit, weapon);
             }
         }
@@ -265,18 +236,10 @@ namespace Manager
             Debug.Log("Doing movement action for unit: " + unit);
             if (typeof(PlayerUnitController).IsInstanceOfType(unit) && unit == activeUnit)
             {
-                RemoveActionButtons();
+                displayManager.RemoveActionButtons();
                 gridManager.ShowMovementOptionsForPlayerUnit((PlayerUnitController)unit);
             }
             //TO DO Enemy and Ally movement
-        }
-
-        private void RemoveActionButtons() 
-        {
-            foreach (GameObject button in actionButtons) {
-                Destroy(button);
-            }
-            actionButtons.Clear();
         }
 
         private void EndUnitTurn(AbstractUnitController unit)

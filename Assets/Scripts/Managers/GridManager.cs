@@ -11,8 +11,8 @@ namespace Manager
     {
         //Z values for tiles and units
         private const float GRID_TILE_Z = 1.0f;
-        private const float DISPLAY_TILE_Z = 0.5f;
-        private const float UNIT_Z = 0.0f;
+        private const float UNIT_Z = 0.5f;
+        private const float DISPLAY_TILE_Z = 0.0f;
 
         private enum Direction
         {

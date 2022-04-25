@@ -41,12 +41,12 @@ public class EventManager : MonoBehaviour
     */
 
     //Event to display attack options when attack action is selected
-    public event Action<AbstractUnitController, List<Actions.WeaponAction>> onAttackAction;
-    public void AttackActionForUnit(AbstractUnitController unit, List<Actions.WeaponAction> actions)
+    public event Action<Actions.AttackAction, AbstractUnitController> onAttackAction;
+    public void AttackActionForUnit(Actions.AttackAction action, AbstractUnitController unit)
     {
         if (onAttackAction != null)
         {
-            onAttackAction(unit, actions);
+            onAttackAction(action, unit);
         }
     }
 
