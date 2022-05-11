@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Manager;
 
-public abstract class AbstractTileController : MonoBehaviour
+//Abstract Controller Class to contain default positional functions and fields
+public abstract class AbstractController : MonoBehaviour
 {
     //Position variables
     private int posX;
@@ -13,6 +13,12 @@ public abstract class AbstractTileController : MonoBehaviour
     {
         posX = x;
         posY = y;
+    }
+
+    public void SetPosition(Vector2Int position)
+    {
+        posX = position.x;
+        posY = position.y;
     }
 
     public Vector2Int GetPosition()

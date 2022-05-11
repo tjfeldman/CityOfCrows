@@ -151,7 +151,7 @@ namespace Manager
                 unit.transform.parent = transform;
                 PlayerUnitController pc = unit.GetComponentInChildren<PlayerUnitController>();                
                 pc.SetStartingTile(tile.GetComponentInChildren<TerrainTileController>());
-                tile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(pc);
+                tile.GetComponentInChildren<TerrainTileController>().Unit = pc;
                 unit.name = pc.ToString();
             }
         }
@@ -174,7 +174,7 @@ namespace Manager
                 unit.transform.parent = transform;
                 EnemyUnitController enemy = unit.GetComponentInChildren<EnemyUnitController>();                
                 enemy.SetStartingTile(tile.GetComponentInChildren<TerrainTileController>());
-                tile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(enemy);
+                tile.GetComponentInChildren<TerrainTileController>().Unit = enemy;
                 unit.name = enemy.ToString();
             }
         }
@@ -203,10 +203,12 @@ namespace Manager
             GetAttackRangeForWeaponFromPosition(validAttackOptions, weapon, unit.GetPosition());
             foreach (GameObject tile in validAttackOptions)
             {
-                Vector2Int tilePos = tile.GetComponentInChildren<TerrainTileController>().GetPosition();
+                TerrainTileController terrainTile = tile.GetComponentInChildren<TerrainTileController>();
+                Vector2Int tilePos = terrainTile.GetPosition();
                 GameObject attackTile = Instantiate(AttackTile, new Vector3(tilePos.x, tilePos.y, DISPLAY_TILE_Z), Quaternion.identity);
-                attackTile.GetComponentInChildren<AttackTileController>().SetPosition(tilePos.x, tilePos.y);
-                attackTile.GetComponentInChildren<AttackTileController>().Unit = unit;
+                attackTile.GetComponentInChildren<PreviewAttackController>().SetPosition(tilePos.x, tilePos.y);
+                attackTile.GetComponentInChildren<PreviewAttackController>().Unit = unit;
+                attackTile.GetComponentInChildren<PreviewAttackController>().TerrainTile = terrainTile;
                 attackTile.transform.parent = transform;
                 attackTile.gameObject.name = "Attack Tile (X: " + tilePos.x.ToString() + ", Y: " + tilePos.y.ToString() + ")";
                 attackTiles.Add(attackTile);
@@ -306,10 +308,12 @@ namespace Manager
             List<GameObject> movementTiles = new List<GameObject>();
             foreach (GameObject tile in validMovementOptions) 
             {
-                Vector2Int tilePos = tile.GetComponentInChildren<TerrainTileController>().GetPosition();
+                TerrainTileController terrainTile = tile.GetComponentInChildren<TerrainTileController>();
+                Vector2Int tilePos = terrainTile.GetPosition();
                 GameObject movementTile = Instantiate(MoveTile, new Vector3(tilePos.x, tilePos.y, DISPLAY_TILE_Z), Quaternion.identity);
-                movementTile.GetComponentInChildren<MoveTileController>().Unit = unit;
-                movementTile.GetComponentInChildren<MoveTileController>().SetPosition(tilePos.x, tilePos.y);
+                movementTile.GetComponentInChildren<PreviewMoveController>().Unit = unit;
+                movementTile.GetComponentInChildren<PreviewMoveController>().TerrainTile = terrainTile;
+                movementTile.GetComponentInChildren<PreviewMoveController>().SetPosition(tilePos.x, tilePos.y);
                 movementTile.transform.parent = transform;
                 movementTile.gameObject.name = "Movement Tile (X: " + tilePos.x.ToString() + ", Y: " + tilePos.y.ToString() + ")";
                 movementTiles.Add(movementTile);
@@ -324,7 +328,7 @@ namespace Manager
                 List<GameObject> movementTiles = storedMovementTiles[unit];
                 foreach (GameObject movementTile in movementTiles)
                 {
-                    movementTile.GetComponentInChildren<MoveTileController>().AllowMovement();
+                    movementTile.GetComponentInChildren<PreviewMoveController>().AllowMovement();
                 }
             }
         }
@@ -341,8 +345,8 @@ namespace Manager
 
             unit.gameObject.transform.parent.position = new Vector3(tilePos.x, tilePos.y);
             unit.SetCurrentTile(newTerrainTile.GetComponentInChildren<AbstractTileController>());
-            oldTerrainTile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(null);//remove unit being on old tile
-            newTerrainTile.GetComponentInChildren<TerrainTileController>().SetUnitOnTile(unit);//add unit being on new tile
+            oldTerrainTile.GetComponentInChildren<TerrainTileController>().Unit = null;//remove unit being on old tile
+            newTerrainTile.GetComponentInChildren<TerrainTileController>().Unit = unit;//add unit being on new tile
             CloseMovementForUnit(unit);
 
             //clear stored movement option dictionary so movement options have to be recalculated since a unit has moved locations

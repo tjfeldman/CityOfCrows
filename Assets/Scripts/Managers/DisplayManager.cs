@@ -55,22 +55,27 @@ namespace Manager
             TurnDisplay.SetActive(false);
         }
 
-        public void CloseDisplay() {
+        private void CloseDisplay() {
             Debug.Log("Turning Display Off");
             StatDisplay.SetActive(false);
         }
 
         //update text for unit and turn display on
         public void DisplayStatForUnit(AbstractUnitController unit) 
-        {       
-            nameText.text = unit.UnitName;
-            healthText.text = unit.CurrentHealth + "/" + unit.MaxHealth;
-            strengthText.text = unit.Strength.ToString();
-            precisionText.text = unit.Precision.ToString();
-            speedText.text = unit.Speed.ToString();
-            armorText.text = unit.Armor.ToString();
-            movementText.text = unit.Movement.ToString();
-            StatDisplay.SetActive(true);
+        {   
+            if (unit != null)
+            {
+                nameText.text = unit.UnitName;
+                healthText.text = unit.CurrentHealth + "/" + unit.MaxHealth;
+                strengthText.text = unit.Strength.ToString();
+                precisionText.text = unit.Precision.ToString();
+                speedText.text = unit.Speed.ToString();
+                armorText.text = unit.Armor.ToString();
+                movementText.text = unit.Movement.ToString();
+                StatDisplay.SetActive(true);
+            } else {
+                CloseDisplay();//close display if no unit was given
+            }
         }
 
         //display action buttons next to location

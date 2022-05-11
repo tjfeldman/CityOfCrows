@@ -45,6 +45,8 @@ namespace Manager
         private bool attackActionActive = false; //prevent spawning multiple weapon buttons
         private bool attackRangeActive = false;
 
+        private AbstractUnitController lastDisplayRequest = null;
+
         // Start is called before the first frame update
         void Start()
         {
@@ -169,6 +171,10 @@ namespace Manager
         {
             currentTurn = team;
             Debug.Log("It is now the " + team.ToString() + " turn");
+            if (currentTurn == TeamType.Player)
+            {
+                DisplayInformationForUnit(lastDisplayRequest);
+            }
         }
 
         //Turns off displays for active unit is one exists
@@ -176,12 +182,12 @@ namespace Manager
         {
             if (activeUnit) 
             {
-                attackActionActive = false;
                 displayManager.RemoveActionButtons();
-                displayManager.CloseDisplay();
+                displayManager.DisplayStatForUnit(null);
                 gridManager.CloseAttackOptionsForUnit(activeUnit);
-                attackRangeActive = false;
                 gridManager.CloseMovementForUnit(activeUnit);
+                attackRangeActive = false;
+                attackActionActive = false;
                 activeUnit = null;
             }
         }
@@ -189,11 +195,16 @@ namespace Manager
         //Event Handling
         private void DisplayInformationForUnit(AbstractUnitController unit)
         {
-            //When the unit is not the active unit, display the threat range, prevents rewritting the threat range. TODO: Change how this is handled
-            if (unit != activeUnit) {
-                displayManager.DisplayStatForUnit(unit);
-                gridManager.ShowMovementForUnit(unit);
+            //Only Show Information During Player's Turn
+            if (currentTurn == TeamType.Player) 
+            {
+                //When the unit is not the active unit, display the threat range, prevents rewritting the threat range. TODO: Change how this is handled
+                if (unit != activeUnit) {
+                    displayManager.DisplayStatForUnit(unit);
+                    gridManager.ShowMovementForUnit(unit);
+                }
             }
+            lastDisplayRequest = unit;
         }
 
         private void HideDisplayInformationForUnit(AbstractUnitController unit)
@@ -202,13 +213,10 @@ namespace Manager
             if (unit != activeUnit) 
             {
                 gridManager.CloseMovementForUnit(unit);
-                //if there is an active unit, then display the active unit stats
-                if (activeUnit) {
-                    displayManager.DisplayStatForUnit(activeUnit);
-                } else {
-                    displayManager.CloseDisplay();
-                }
+                //Display the active unit stats instead of hovered unit
+                displayManager.DisplayStatForUnit(activeUnit);
             }
+            lastDisplayRequest = null;
         }
 
         private void OnUnitClicked(AbstractUnitController unit)

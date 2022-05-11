@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Manager;
 
 [System.Serializable]
-public class TerrainTileController : AbstractTileController
+public class TerrainTileController : AbstractTileController, ITerrain
 {
 
     //tile values
@@ -13,12 +12,17 @@ public class TerrainTileController : AbstractTileController
     private int detectionPenalty = 0;
     private AbstractUnitController unit = null;
 
-
     //getters
-    public string TileName { get { return tileName; }}
-    public int MovementCost { get { return movementCost; }}
-    public int DetectionPenalty { get { return detectionPenalty; }}
-    public AbstractUnitController Unit { get { return unit; }}
+    public string Name => tileName;
+    public int MovementCost => movementCost;
+    public AbstractUnitController Unit {
+        get {
+            return unit;
+        }
+        set {
+            unit = value;
+        }
+    }
     
     public void LoadTileData(TileData data)
     {
@@ -36,11 +40,6 @@ public class TerrainTileController : AbstractTileController
         }
     }
 
-    public void SetUnitOnTile(AbstractUnitController unit)
-    {
-        this.unit = unit;
-    }
-
     void OnMouseDown() 
     {
         EventManager.current.TileClicked(this);
@@ -48,7 +47,7 @@ public class TerrainTileController : AbstractTileController
 
     public override string ToString()
     {
-        return TileName;
+        return Name;
     }
 
 }

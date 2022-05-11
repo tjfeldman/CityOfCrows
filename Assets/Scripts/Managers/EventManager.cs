@@ -90,8 +90,8 @@ public class EventManager : MonoBehaviour
     }
 
     //Event to move unit to a location
-    public event Action<AbstractUnitController, MoveTileController> onUnitMovement;
-    public void MoveUnitToTile(AbstractUnitController unit, MoveTileController tile) 
+    public event Action<AbstractUnitController, AbstractTileController> onUnitMovement;
+    public void MoveUnitToTile(AbstractUnitController unit, AbstractTileController tile) 
     {
         if (onUnitMovement != null)
         {

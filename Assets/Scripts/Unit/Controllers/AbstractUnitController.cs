@@ -175,7 +175,7 @@ public abstract class AbstractUnitController : MonoBehaviour
         return inventory.GetWeapons();
     }
 
-    private void Moved(AbstractUnitController unit, MoveTileController tile)
+    private void Moved(AbstractUnitController unit, AbstractTileController tile)
     {
         if (unit == this) {
             move = false;

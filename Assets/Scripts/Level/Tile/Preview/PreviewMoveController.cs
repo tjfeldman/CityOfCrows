@@ -1,12 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Manager;
 
-public class MoveTileController : AbstractTileController
+public class PreviewMoveController : AbstractPreviewController
 {
-    public AbstractUnitController Unit;
-
     private bool active = false;
 
     public void AllowMovement()
@@ -14,11 +11,11 @@ public class MoveTileController : AbstractTileController
         active = true;
     }
 
-    void OnMouseDown() 
+    protected override void DoAction()
     {
         //only allow event to trigger if the move tile controller is active
         if (active) {
-            EventManager.current.MoveUnitToTile(Unit, this);
+            EventManager.current.MoveUnitToTile(Unit, TerrainTile);
         }
     }
 }
